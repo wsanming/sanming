@@ -3,10 +3,13 @@
  */
 package com.jeesite.modules.sys.entity;
 
+import java.util.Date;
 import java.util.List;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.*;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.jeesite.common.lang.TimeUtils;
 import org.hibernate.validator.constraints.Length;
 
 import com.jeesite.common.collect.ListUtils;
@@ -34,6 +37,9 @@ import com.jeesite.common.mybatis.mapper.query.QueryType;
 		@Column(name="office_name", attrName="office.officeName", 	label="机构名称", isQuery=false),
 		@Column(name="company_code", attrName="company.companyCode", label="公司编码", isQuery=false),
 		@Column(name="company_name", attrName="company.companyName", label="公司名称", isQuery=false),
+		@Column(name="hire_date", attrName="hireDate", label="入职时间", isQuery=false),
+		@Column(name="regular_date", attrName="regularDate", label="转正时间", isQuery=false),
+		@Column(name="is_hw", attrName="isHw", label="是否具有华为认证", isQuery=false),
 	}, joinTable={
 		@JoinTable(type=Type.LEFT_JOIN, entity=Office.class, alias="o", 
 			on="o.office_code = a.office_code",
@@ -59,6 +65,10 @@ public class Employee extends DataEntity<Employee> {
 	private Company company;	// 公司编码
 	
 	private String postCode;	// 根据职位查询
+
+	private Date hireDate;//入职时间
+	private Date regularDate;//转正时间
+	private String isHw;//是否具有华为认证
 
 	private List<EmployeePost> employeePostList = ListUtils.newArrayList(); // 关联岗位信息
 	private List<EmployeeOffice> employeeOfficeList = ListUtils.newArrayList(); // 关联附属机构信息
@@ -152,9 +162,39 @@ public class Employee extends DataEntity<Employee> {
 		}
 	}
 
+	@JsonFormat(
+			pattern = "yyyy-MM-dd"
+	)
+	@NotNull(message="入职时间不能为空")
+	public Date getHireDate(){
+		return hireDate;
+	}
+	public void setHireDate(Date hireDate){
+		this.hireDate = hireDate;
+	}
+
+	@JsonFormat(
+			pattern = "yyyy-MM-dd"
+	)
+	@NotNull(message="转正时间不能为空")
+	public Date getRegularDate(){
+		return regularDate;
+	}
+	public void setRegularDate(Date regularDate){
+		this.regularDate = regularDate;
+	}
+
+	@NotNull(message="是否具有华为认证不能为空")
+	public String getIsHw(){
+		return isHw;
+	}
+	public void setIsHw(String isHw){
+		this.isHw = isHw;
+	}
 	public List<EmployeeOffice> getEmployeeOfficeList() {
 		return employeeOfficeList;
 	}
+
 
 	public void setEmployeeOfficeList(List<EmployeeOffice> employeeOfficeList) {
 		this.employeeOfficeList = employeeOfficeList;
