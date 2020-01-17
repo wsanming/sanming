@@ -1,212 +1,293 @@
 <% layout('/layouts/default.html', {title: '用户管理', libs: ['validate','dataGrid']}){ %>
 <div class="main-content">
-	<div class="box box-main">
-		<div class="box-header with-border">
-			<div class="box-title">
-				<i class="fa icon-people"></i> ${text(empUser.isNewRecord ? '新增用户' : op == 'auth' ? '用户分配角色' : '编辑用户')}
-			</div>
-			<div class="box-tools pull-right">
-				<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-			</div>
-		</div>
-		<#form:form id="inputForm" model="${empUser}" action="${ctx}/sys/empUser/save" method="post" class="form-horizontal">
-			<#form:hidden name="op" value="${op}"/>
-			<#form:hidden name="userType" value="employee"/>
-			<#form:hidden path="userCode"/>
-			<div class="box-body">
-				<% if(op=='auth'){ %><br/><% } %>
-				<% if(op == 'add' || op == 'edit') { %>
-				<div class="form-unit">${text('基本信息')}</div>
-				<div class="row">
-					<div class="col-xs-6">
-						<div class="form-group">
-							<label class="control-label col-sm-4" title="">
-								<span class="required ">*</span> ${text('归属机构')}：<i class="fa icon-question hide"></i></label>
-							<div class="col-sm-8">
-								<#form:treeselect id="office" title="${text('机构选择')}"
-									path="employee.office.officeCode" labelPath="employee.office.officeName" 
-									url="${ctx}/sys/office/treeData?ctrlPermi=${@Global.getConfig('user.adminCtrlPermi', '2')}" class="required" allowClear="false"/>
-							</div>
-						</div>
-					</div>
-					<div class="col-xs-6">
-						<div class="form-group">
-							<label class="control-label col-sm-4" title="">
-								<span class="required hide">*</span> ${text('归属公司')}：<i class="fa icon-question hide"></i></label>
-							<div class="col-sm-8">
-								<#form:treeselect id="company" title="${text('公司选择')}"
-									path="employee.company.companyCode" labelPath="employee.company.companyName" 
-									url="${ctx}/sys/company/treeData?ctrlPermi=${@Global.getConfig('user.adminCtrlPermi', '2')}" btnClass="" allowClear="true"/>
-							</div>
-						</div>
-					</div>
-				</div>
-				<% } %>
-				<div class="row">
-					<div class="col-xs-6">
-						<div class="form-group">
-							<label class="control-label col-sm-4" title="">
-								<span class="required ">*</span> ${text('登录账号')}：<i class="fa icon-question hide"></i></label>
-							<div class="col-sm-8">
-								<#form:hidden name="oldLoginCode" value="${empUser.loginCode}"/>
-								<#form:input path="loginCode" minlength="4" maxlength="20" readonly="${op=='auth'}"
-									class="form-control required userName"
-									remote="${ctx}/sys/user/checkLoginCode?oldLoginCode=${empUser.loginCode}"
-									data-msg-remote="${text('登录账号已存在')}"/>
-							</div>
-						</div>
-					</div>
-					<div class="col-xs-6">
-						<div class="form-group">
-							<label class="control-label col-sm-4" title="">
-								<span class="required ">*</span> ${text('用户昵称')}：<i class="fa icon-question hide"></i></label>
-							<div class="col-sm-8">
-								<#form:input path="userName" maxlength="32" readonly="${op=='auth'}" class="form-control required "/>
-							</div>
-						</div>
-					</div>
-				</div>
-				<% if(op == 'add' || op == 'edit') { %>
-				<div class="row">
-					<div class="col-xs-6">
-						<div class="form-group">
-							<label class="control-label col-sm-4" title="">
-								<span class="required hide">*</span> ${text('电子邮箱')}：<i class="fa icon-question hide"></i></label>
-							<div class="col-sm-8">
-								<div class="input-group">
-									<#form:input path="email" maxlength="300" class="form-control email"/>
-									<span class="input-group-addon"><i class="fa fa-fw fa-envelope" style="margin-top:-2px;display:block;"></i></span>
-				                </div>
-							</div>
-						</div>
-					</div>
-					<div class="col-xs-6">
-						<div class="form-group">
-							<label class="control-label col-sm-4" title="">
-								<span class="required hide">*</span> ${text('手机号码')}：<i class="fa icon-question hide"></i></label>
-							<div class="col-sm-8">
-								<div class="input-group">
-									<#form:input path="mobile" maxlength="100" class="form-control mobile"/>
-									<span class="input-group-addon"><i class="fa fa-fw fa-mobile" style="margin-top:-2px;display:block;"></i></span>
-				                </div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-xs-6">
-						<div class="form-group">
-							<label class="control-label col-sm-4" title="">
-								<span class="required hide">*</span> ${text('办公电话')}：<i class="fa icon-question hide"></i></label>
-							<div class="col-sm-8">
-								<div class="input-group">
-									<#form:input path="phone" maxlength="100" class="form-control phone"/>
-									<span class="input-group-addon"><i class="fa fa-fw fa-phone"></i></span>
-				                </div>
-							</div>
-						</div>
-					</div>
-					<div class="col-xs-6">
-						<div class="form-group">
-							<label class="control-label col-sm-4" title="">
-								<span class="required hide">*</span> ${text('权重(排序)')}：<i class="fa icon-question hide"></i></label>
-							<div class="col-sm-8">
-								<#form:input path="userWeight" maxlength="8" class="form-control digits" placeholder="${text('权重越大排名越靠前，请填写数字。')}"/>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="form-unit">${text('详细信息')}</div>
-				<div class="row">
-					<div class="col-xs-6">
-						<div class="form-group">
-							<label class="control-label col-sm-4" title="">
-								<span class="required hide">*</span> ${text('员工编号')}：<i class="fa icon-question hide"></i></label>
-							<div class="col-sm-8">
-								<#form:input path="employee.empCode" maxlength="32" readonly="${!empUser.isNewRecord}" class="form-control userName"/>
-							</div>
-						</div>
-					</div>
-					<div class="col-xs-6">
-						<div class="form-group">
-							<label class="control-label col-sm-4" title="">
-								<span class="required hide">*</span> ${text('员工姓名')}：<i class="fa icon-question hide"></i></label>
-							<div class="col-sm-8">
-								<#form:input path="employee.empName" maxlength="32" class="form-control "/>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-xs-6">
-						<div class="form-group">
-							<label class="control-label col-sm-4" title="">
-								<span class="required hide">*</span> ${text('所在岗位')}：<i class="fa icon-question hide"></i></label>
-							<div class="col-sm-8">
-								<#form:select multiple="true" path="employee.employeePosts" items="${postList}"
-									itemLabel="postName" itemValue="postCode" class="form-control"/>
-							</div>
-						</div>
-					</div>
-					<div class="col-xs-6">
-						<div class="form-group">
-							<label class="control-label col-sm-4" title="">
-								<span class="required hide">*</span> ${text('英文名')}：<i class="fa icon-question hide"></i></label>
-							<div class="col-sm-8">
-								<#form:input path="employee.empNameEn" maxlength="32" class="form-control "/>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-xs-12">
-						<div class="form-group">
-							<label class="control-label col-sm-2" title="">
-								<span class="required hide">*</span> ${text('附属机构')}：<i class="fa icon-question hide"></i></label>
-							<div class="col-sm-10">
-								<table id="empOfficeGrid"></table>
-								<% if (hasPermi('sys:empUser:edit')){ %>
-									<a href="#" id="empOfficeGridAddRowBtn" class="btn btn-primary btn-sm mt10 mb10"><i class="fa fa-plus"></i> ${text('增行')}</a>
-								<% } %>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-xs-12">
-						<div class="form-group">
-							<label class="control-label col-sm-2" title="">
-								<span class="required hide">*</span> ${text('备注信息')}：<i class="fa icon-question hide"></i></label>
-							<div class="col-sm-10">
-								<#form:textarea path="remarks" rows="4" maxlength="500" class="form-control "/>
-							</div>
-						</div>
-					</div>
-				</div>
-				<% } %>
-				<% if(op == 'add' || op == 'auth') { %>
-				<div class="form-unit">${text('分配角色')}</div>
-				<div class="pl10 pb20">
-					<table id="roleGrid"></table>
-					<#form:hidden name="userRoleString"/>
-				</div>
-			    <% } %>
-				<% if(op == 'add' || op == 'edit') { %>
-				<#form:extend collapsed="true" />
-				<% } %>
-			</div>
-			<div class="box-footer">
-				<div class="row">
-					<div class="col-sm-offset-2 col-sm-10">
-						<% if (hasPermi('sys:empUser:edit')){ %>
-							<button type="submit" class="btn btn-sm btn-primary" id="btnSubmit"><i class="fa fa-check"></i> ${text('保 存')}</button>&nbsp;
-						<% } %>
-						<button type="button" class="btn btn-sm btn-default" id="btnCancel" onclick="js.closeCurrentTabPage()"><i class="fa fa-reply-all"></i> ${text('关 闭')}</button>
-					</div>
-				</div>
-			</div>
-		</#form:form>
-	</div>
+    <div class="box box-main">
+        <div class="box-header with-border">
+            <div class="box-title">
+                <i class="fa icon-people"></i> ${text(empUser.isNewRecord ? '新增用户' : op == 'auth' ? '用户分配角色' : '编辑用户')}
+            </div>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            </div>
+        </div>
+        <#form:form id="inputForm" model="${empUser}" action="${ctx}/sys/empUser/save" method="post" class="form-horizontal">
+        <#form:hidden name="op" value="${op}"/>
+        <#form:hidden name="userType" value="employee"/>
+        <#form:hidden path="userCode"/>
+        <div class="box-body">
+            <% if(op=='auth'){ %><br/><% } %>
+            <% if(op == 'add' || op == 'edit') { %>
+            <div class="form-unit">${text('基本信息')}</div>
+            <div class="row">
+                <div class="col-xs-6">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" title="">
+                            <span class="required ">*</span> ${text('归属机构')}：<i class="fa icon-question hide"></i></label>
+                        <div class="col-sm-8">
+                            <#form:treeselect id="office" title="${text('机构选择')}"
+                            path="employee.office.officeCode" labelPath="employee.office.officeName"
+                            url="${ctx}/sys/office/treeData?ctrlPermi=${@Global.getConfig('user.adminCtrlPermi', '2')}" class="required" allowClear="false"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-6">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" title="">
+                            <span class="required hide">*</span> ${text('归属公司')}：<i class="fa icon-question hide"></i></label>
+                        <div class="col-sm-8">
+                            <#form:treeselect id="company" title="${text('公司选择')}"
+                            path="employee.company.companyCode" labelPath="employee.company.companyName"
+                            url="${ctx}/sys/company/treeData?ctrlPermi=${@Global.getConfig('user.adminCtrlPermi', '2')}" btnClass="" allowClear="true"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <% } %>
+            <div class="row">
+                <div class="col-xs-6">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" title="">
+                            <span class="required ">*</span> ${text('登录账号')}：<i class="fa icon-question hide"></i></label>
+                        <div class="col-sm-8">
+                            <#form:hidden name="oldLoginCode" value="${empUser.loginCode}"/>
+                            <#form:input path="loginCode" minlength="4" maxlength="20" readonly="${op=='auth'}"
+                            class="form-control required userName"
+                            remote="${ctx}/sys/user/checkLoginCode?oldLoginCode=${empUser.loginCode}"
+                            data-msg-remote="${text('登录账号已存在')}"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-6">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" title="">
+                            <span class="required ">*</span> ${text('用户昵称')}：<i class="fa icon-question hide"></i></label>
+                        <div class="col-sm-8">
+                            <#form:input path="userName" maxlength="32" readonly="${op=='auth'}" class="form-control required "/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <% if(op == 'add' || op == 'edit') { %>
+            <div class="row">
+                <div class="col-xs-6">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" title="">
+                            <span class="required hide">*</span> ${text('电子邮箱')}：<i class="fa icon-question hide"></i></label>
+                        <div class="col-sm-8">
+                            <div class="input-group">
+                                <#form:input path="email" maxlength="300" class="form-control email"/>
+                                <span class="input-group-addon"><i class="fa fa-fw fa-envelope" style="margin-top:-2px;display:block;"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-6">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" title="">
+                            <span class="required hide">*</span> ${text('手机号码')}：<i class="fa icon-question hide"></i></label>
+                        <div class="col-sm-8">
+                            <div class="input-group">
+                                <#form:input path="mobile" maxlength="100" class="form-control mobile"/>
+                                <span class="input-group-addon"><i class="fa fa-fw fa-mobile" style="margin-top:-2px;display:block;"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-6">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" title="">
+                            <span class="required hide">*</span> ${text('办公电话')}：<i class="fa icon-question hide"></i></label>
+                        <div class="col-sm-8">
+                            <div class="input-group">
+                                <#form:input path="phone" maxlength="100" class="form-control phone"/>
+                                <span class="input-group-addon"><i class="fa fa-fw fa-phone"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <script src="../../../../static/My97DatePicker"></script>
+                <div class="col-xs-6">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" title="">
+                            <span class="required">*</span> ${text('入职时间')}：<i
+                                class="fa icon-question hide"></i></label>
+                        <div class="col-sm-8">
+                            <div class="input-group">
+                                <#form:input path="employee.hireDate" id="hireDate" dataFormat="date" maxlength="100"
+                                class="form-control required" onClick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false})"/>
+                                <span class="input-group-addon"><i class="fa fa-fw fa-calendar"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-6">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" title="">
+                            <span class="required ">*</span> ${text('转正时间')}：<i
+                                class="fa icon-question hide"></i></label>
+                        <div class="col-sm-8">
+                            <div class="input-group">
+                                <#form:input path="employee.regularDate" id="regularDate" dataFormat="date"
+                                maxlength="100" class="form-control required" onClick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false})"/>
+                                <span class="input-group-addon"><i class="fa fa-fw fa-calendar"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-6">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" title="">
+                            <span class="required hide">*</span> ${text('权重(排序)')}：<i class="fa icon-question hide"></i></label>
+                        <div class="col-sm-8">
+                            <#form:input path="userWeight" maxlength="8" class="form-control digits" placeholder="${text('权重越大排名越靠前，请填写数字。')}"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-6">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" title="">
+                            <span class="required ">*</span> ${text('是否华为认证讲师')}：<i
+                                class="fa icon-question hide"></i></label>
+                        <div class="col-sm-8">
+                            <#form:radio path="employee.isHw" dictType="sys_yes_no" class="form-control required" />
+
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <div class="col-xs-6" id="uploadHw" style="display: none">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" title="">
+                            <span class="required ">*</span> ${text('相关证书')}：<i
+                                class="fa icon-question hide"></i></label>
+                        <div class="col-xs-6">
+                            <a href="${ctx}/sys/filemanager/hwFile/form" id="btnUploadFile"
+                               class="btn btn-default addTabPage" title="${text('上传证书')}"
+                               data-layer="true" data-layer-width="950" data-layer-height="430"><i
+                                    class="fa fa-upload"></i> ${text('上传证书')}</a>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="row" id="hwList" style="display: none">
+                <div class="col-xs-12">
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" title="">
+                            <span class="required hide">*</span> ${text('已有证书')}：<i
+                                class="fa icon-question hide"></i></label>
+                        <div class="col-sm-10" id="hw">
+                            <!--							<iframe src="${ctx}/sys/filemanager/hwFile/list" frameborder="0" width="100%"></iframe>-->
+                            <table id="dataGrid"></table>
+                            <div id="dataGridPage"></div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+            <div class="form-unit">${text('详细信息')}</div>
+            <div class="row">
+                <div class="col-xs-6">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" title="">
+                            <span class="required hide">*</span> ${text('员工编号')}：<i class="fa icon-question hide"></i></label>
+                        <div class="col-sm-8">
+                            <#form:input path="employee.empCode" maxlength="32" readonly="${!empUser.isNewRecord}" class="form-control userName"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-6">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" title="">
+                            <span class="required hide">*</span> ${text('员工姓名')}：<i class="fa icon-question hide"></i></label>
+                        <div class="col-sm-8">
+                            <#form:input path="employee.empName" maxlength="32" class="form-control "/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-6">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" title="">
+                            <span class="required hide">*</span> ${text('所在岗位')}：<i class="fa icon-question hide"></i></label>
+                        <div class="col-sm-8">
+                            <#form:select multiple="true" path="employee.employeePosts" items="${postList}"
+                            itemLabel="postName" itemValue="postCode" class="form-control"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-6">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" title="">
+                            <span class="required hide">*</span> ${text('英文名')}：<i class="fa icon-question hide"></i></label>
+                        <div class="col-sm-8">
+                            <#form:input path="employee.empNameEn" maxlength="32" class="form-control "/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" title="">
+                            <span class="required hide">*</span> ${text('附属机构')}：<i class="fa icon-question hide"></i></label>
+                        <div class="col-sm-10">
+                            <table id="empOfficeGrid"></table>
+                            <% if (hasPermi('sys:empUser:edit')){ %>
+                            <a href="#" id="empOfficeGridAddRowBtn" class="btn btn-primary btn-sm mt10 mb10"><i class="fa fa-plus"></i> ${text('增行')}</a>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" title="">
+                            <span class="required hide">*</span> ${text('备注信息')}：<i class="fa icon-question hide"></i></label>
+                        <div class="col-sm-10">
+                            <#form:textarea path="remarks" rows="4" maxlength="500" class="form-control "/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <% } %>
+            <% if(op == 'add' || op == 'auth') { %>
+            <div class="form-unit">${text('分配角色')}</div>
+            <div class="pl10 pb20">
+                <table id="roleGrid"></table>
+                <#form:hidden name="userRoleString"/>
+            </div>
+            <% } %>
+            <% if(op == 'add' || op == 'edit') { %>
+            <#form:extend collapsed="true" />
+            <% } %>
+        </div>
+        <div class="box-footer">
+            <div class="row">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <% if (hasPermi('sys:empUser:edit')){ %>
+                    <button type="submit" class="btn btn-sm btn-primary" id="btnSubmit"><i class="fa fa-check"></i> ${text('保 存')}</button>&nbsp;
+                    <% } %>
+                    <button type="button" class="btn btn-sm btn-default" id="btnCancel" onclick="js.closeCurrentTabPage()"><i class="fa fa-reply-all"></i> ${text('关 闭')}</button>
+                </div>
+            </div>
+        </div>
+    </#form:form>
+
+</div>
+<#form:form id="searchForm" model="${hwFileList}" action="${ctx}/sys/empUser/hw?loginCode=${empUser.loginCode}" method="get" class="form-inline hide"
+data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-order-by="${parameter.orderBy}">
+</#form:form>
 </div>
 <% } %>
 <script id="treeselectTpl" type="text/template">//<!--<div>
@@ -215,93 +296,171 @@
 	class="{{d.cssClass}}" btnClass="btn-sm" allowClear="true"/>
 </div>//--></script>
 <script>
-$("#empOfficeGrid").dataGrid({
-	data: ${toJson(empUser.employee.employeeOfficeList)},
-	datatype: "local", // 设置本地数据
-	columnModel: [
-		{header:'${text("附属机构")}', name:'officeName', sortable:false, width:100,
-			formatter: function(val, obj, row, act){
-				return js.val(row, 'officeCode')+'|'+js.val(row, 'officeName');
-			}, editable: true, edittype: "custom", editoptions: {
-				custom_element: function(val, editOptions) {
-					return js.template('treeselectTpl', {
-						id: 'office_'+editOptions.id, title: '机构选择', 
-						name: 'officeCode', value: val.split('|')[0], 
-						labelName: 'officeName', labelValue: val.split('|')[1],
-						url: '${ctx}/sys/office/treeData', cssClass: 'required'
-					});
-				}
-			}
-		},
-		{header:'${text("附属岗位")}', name:'postCode', sortable:false, width:100, 
-			editable:true, edittype:'select', editoptions:{'class':'form-control',
-				items: $.merge([{postName:'&nbsp;',postCode:''}], ${toJson(postList)}),
-				itemLabel: 'postName', itemValue: 'postCode', dataInit: function(element){
-					$(element).select2().on("change",function(){$(this).resetValid()});
-				}
-			}
-		},
-		{header:'${text("操作")}', name:'actions', width:80, sortable:false, fixed:true, formatter: function(val, obj, row, act){
-			var actions = [];
-			actions.push('<a href="#" onclick="js.confirm(\'${text("你确认要删除这条数据吗？")}\', function(){$(\'#empOfficeGrid\').dataGrid(\'delRowData\',\''+obj.rowId+'\')});return false;"><i class="fa fa-trash-o"></i></a>&nbsp;');
-			return actions.join('');
-		}, editoptions: {defaultValue: 'new'}}
-	],
-	autoGridHeight: function(){return 'auto'}, // 设置自动高度
-	
-	// 编辑表格参数
-	editGrid: true,				// 是否是编辑表格
-	editGridInitRowNum: 0,		// 编辑表格的初始化新增行数
-	editGridAddRowBtn: $('#empOfficeGridAddRowBtn'),	// 子表增行按钮
-	editGridAddRowInitData: {id: '', status: Global.STATUS_NORMAL},	// 新增行的时候初始化的数据
-	
-	// 编辑表格的提交数据参数
-	editGridInputFormListName: 'employee.employeeOfficeList', // 提交的数据列表名
-	editGridInputFormListAttrs: 'officeCode,officeName,postCode,postName,', // 提交数据列表的属性字段
-	
-	ajaxSuccess: function(){
-		
-	}
-});
-<% if(op == 'add' || op == 'auth') {%>
+
+
+    // 根据不同选择结果显示上传证书模块
+    $('#employee_isHw input').on('ifCreated ifChecked', function () {
+
+        if ($(this).is(':checked')) {
+            // 1：是；2：否
+            if ($(this).val() == '1') {
+                // $('.isPerm').hide();
+                $('#uploadHw').show();
+                $('#hwList').show();
+                // $userName =$("#userName").val();
+                // console.log($("#userName").val())
+                // $('iframe').src="${ctx}/sys/filemanager/hwFile/list?fileHolder='+$username+'"
+            } else {
+                $('#uploadHw').hide();
+                $('#hwList').hide();
+                // $('.isPerm').show();
+            }
+        }
+    });
+
+
+
+
+    $("#empOfficeGrid").dataGrid({
+        data: ${toJson(empUser.employee.employeeOfficeList)},
+        datatype: "local", // 设置本地数据
+        columnModel: [
+            {header:'${text("附属机构")}', name:'officeName', sortable:false, width:100,
+                formatter: function(val, obj, row, act){
+                    return js.val(row, 'officeCode')+'|'+js.val(row, 'officeName');
+                }, editable: true, edittype: "custom", editoptions: {
+                    custom_element: function(val, editOptions) {
+                        return js.template('treeselectTpl', {
+                            id: 'office_'+editOptions.id, title: '机构选择',
+                            name: 'officeCode', value: val.split('|')[0],
+                            labelName: 'officeName', labelValue: val.split('|')[1],
+                            url: '${ctx}/sys/office/treeData', cssClass: 'required'
+                        });
+                    }
+                }
+            },
+            {header:'${text("附属岗位")}', name:'postCode', sortable:false, width:100,
+                editable:true, edittype:'select', editoptions:{'class':'form-control',
+                    items: $.merge([{postName:'&nbsp;',postCode:''}], ${toJson(postList)}),
+                    itemLabel: 'postName', itemValue: 'postCode', dataInit: function(element){
+                        $(element).select2().on("change",function(){$(this).resetValid()});
+                    }
+                }
+            },
+            {header:'${text("操作")}', name:'actions', width:80, sortable:false, fixed:true, formatter: function(val, obj, row, act){
+                    var actions = [];
+                    actions.push('<a href="#" onclick="js.confirm(\'${text("你确认要删除这条数据吗？")}\', function(){$(\'#empOfficeGrid\').dataGrid(\'delRowData\',\''+obj.rowId+'\')});return false;"><i class="fa fa-trash-o"></i></a>&nbsp;');
+                    return actions.join('');
+                }, editoptions: {defaultValue: 'new'}}
+        ],
+        autoGridHeight: function(){return 'auto'}, // 设置自动高度
+
+        // 编辑表格参数
+        editGrid: true,				// 是否是编辑表格
+        editGridInitRowNum: 0,		// 编辑表格的初始化新增行数
+        editGridAddRowBtn: $('#empOfficeGridAddRowBtn'),	// 子表增行按钮
+        editGridAddRowInitData: {id: '', status: Global.STATUS_NORMAL},	// 新增行的时候初始化的数据
+
+        // 编辑表格的提交数据参数
+        editGridInputFormListName: 'employee.employeeOfficeList', // 提交的数据列表名
+        editGridInputFormListAttrs: 'officeCode,officeName,postCode,postName,', // 提交数据列表的属性字段
+
+        ajaxSuccess: function(){
+
+        }
+    });
+    <% if(op == 'add' || op == 'auth') {%>
 // 加载角色列表
-var roleGrid = $("#roleGrid").dataGrid({
-	url: '${ctx}/sys/role/treeData',
-	postData: [
-		{name:'userType',value:'employee'},
-		{name:'ctrlPermi',value:'${@Global.getConfig("user.adminCtrlPermi", "2")}'}
-	],
-	columnModel: [
-		{header:'${text("角色名称")}', name:'name', sortable:false, width:100, align:"center"},
-		{header:'${text("角色编码")}', name:'id', sortable:false, width:100, align:"center"}  
-	],
-	showCheckbox: true,
-	autoGridHeight: function(){
-		return 'auto';
-	},
-	autoGridWidth: function(){
-		return $('#inputForm .box-body').width()-20;
-	},
-	ajaxSuccess: function(){
-		<% for (role in roleList!){ %>
- 		roleGrid.dataGrid('setSelectRow', '${role.roleCode}');
-		<% } %>
-	}
-});
-<% } %>
-$("#inputForm").validate({
-	submitHandler: function(form){
-		<% if(op == 'add' || op == 'auth') { // 获取选中角色  %>
-		$("#userRoleString").val(roleGrid.dataGrid('getSelectRows').join(','));
-		<% } %>
-		js.ajaxSubmitForm($(form), function(data){
-			js.showMessage(data.message);
-			if(data.result == Global.TRUE){
-				js.closeCurrentTabPage(function(contentWindow){
-					contentWindow.page();
-				});
-			}
-		}, "json");
-    }
-});
+        var roleGrid = $("#roleGrid").dataGrid({
+            url: '${ctx}/sys/role/treeData',
+            postData: [
+                {name:'userType',value:'employee'},
+                {name:'ctrlPermi',value:'${@Global.getConfig("user.adminCtrlPermi", "2")}'}
+            ],
+            columnModel: [
+                {header:'${text("角色名称")}', name:'name', sortable:false, width:100, align:"center"},
+                {header:'${text("角色编码")}', name:'id', sortable:false, width:100, align:"center"}
+            ],
+            showCheckbox: true,
+            autoGridHeight: function(){
+                return 'auto';
+            },
+            autoGridWidth: function(){
+                return $('#inputForm .box-body').width()-20;
+            },
+            ajaxSuccess: function(){
+            <% for (role in roleList!){ %>
+                    roleGrid.dataGrid('setSelectRow', '${role.roleCode}');
+                <% } %>
+            }
+        });
+    <% } %>
+    $("#inputForm").validate({
+        submitHandler: function(form){
+        <% if(op == 'add' || op == 'auth') { // 获取选中角色  %>
+                $("#userRoleString").val(roleGrid.dataGrid('getSelectRows').join(','));
+            <% } %>
+            js.ajaxSubmitForm($(form), function(data){
+                js.showMessage(data.message);
+                if(data.result == Global.TRUE){
+                    js.closeCurrentTabPage(function(contentWindow){
+                        contentWindow.page();
+                    });
+                }
+            }, "json");
+        }
+    });
+</script>
+<script>
+    // console.log($("#searchForm"));
+    // 初始化DataGrid对象
+    $('#dataGrid').dataGrid({
+        searchForm: $("#searchForm"),
+        columnModel: [
+            {
+                header: '${text("文件名称")}',
+                name: 'fileName',
+                index: 'a.file_name',
+                width: 150,
+                align: "center",
+                frozen: true,
+                formatter: function (val, obj, row, act) {
+                    return '<a href="${ctx}/sys/filemanager/hwFile/form?fileId=' + row.fileId + '" class="btnList" data-title="${text("编辑华为证书")}">' + (val || row.id) + '</a>';
+                }
+            },
+            {header: '${text("证书方向")}', name: 'fileDirection', index: 'a.file_direction', width: 150, align: "center"},
+            {header: '${text("证书等级")}', name: 'fileLevel', index: 'a.file_level', width: 150, align: "center"},
+            {header: '${text("证书持有者")}', name: 'fileHolder', index: 'a.file_holder', width: 150, align: "center"},
+            {header: '${text("证书到期时间")}', name: 'fileDate', index: 'a.file_date', width: 150, align: "center"},
+            {
+                header: '${text("操作")}',
+                name: 'actions',
+                width: 150,
+                sortable: false,
+                title: false,
+                formatter: function (val, obj, row, act) {
+                    var actions = [];
+                <%
+                    if (hasPermi('sys:filemanager:hwFile:edit')) { %>
+                        actions.push('<a href="${ctx}/sys/filemanager/hwFile/form?fileId=' + row.fileId + '" class="btnList" title="${text("编辑华为证书")}"><i class="fa fa-pencil"></i></a>&nbsp;');
+                        if (row.status == Global.STATUS_NORMAL) {
+                            actions.push('<a href="${ctx}/sys/filemanager/hwFile/disable?fileId=' + row.fileId + '" class="btnList" title="${text("停用华为证书")}" data-confirm="${text("确认要停用该华为证书吗？")}"><i class="glyphicon glyphicon-ban-circle"></i></a>&nbsp;');
+                        }
+                        if (row.status == Global.STATUS_DISABLE) {
+                            actions.push('<a href="${ctx}/sys/filemanager/hwFile/enable?fileId=' + row.fileId + '" class="btnList" title="${text("启用华为证书")}" data-confirm="${text("确认要启用该华为证书上传吗？")}"><i class="glyphicon glyphicon-ok-circle"></i></a>&nbsp;');
+                        }
+                        actions.push('<a href="${ctx}/sys/filemanager/hwFile/delete?fileId=' + row.fileId + '" class="btnList" title="${text("删除华为证书")}" data-confirm="${text("确认要删除该华为证书上传吗？")}"><i class="fa fa-trash-o"></i></a>&nbsp;');
+                        actions.push('<a href="${ctx}/sys/filemanager/hwFile/download?fileId=' + row.fileId + '" class="btnList" title="${text("下载华为证书")}"><i class="fa fa-download"></i></a>&nbsp;');
+                    <%
+                    }
+                %>
+                    return actions.join('');
+                }
+            }
+        ],
+        // 加载成功后执行事件
+        ajaxSuccess: function (data) {
+
+        }
+    });
 </script>

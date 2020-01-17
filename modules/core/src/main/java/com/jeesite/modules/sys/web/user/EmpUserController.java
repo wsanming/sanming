@@ -3,12 +3,16 @@
  */
 package com.jeesite.modules.sys.web.user;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import javax.security.auth.message.callback.PrivateKeyCallback;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.jeesite.modules.sys.service.filemanager.HwFileService;
+import org.apache.poi.hwpf.model.io.HWPFFileSystem;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.BeanUtils;
@@ -17,10 +21,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.jeesite.common.codec.EncodeUtils;
@@ -38,6 +39,7 @@ import com.jeesite.modules.sys.entity.EmpUser;
 import com.jeesite.modules.sys.entity.Employee;
 import com.jeesite.modules.sys.entity.Post;
 import com.jeesite.modules.sys.entity.Role;
+import com.jeesite.modules.sys.entity.filemanager.HwFile;
 import com.jeesite.modules.sys.entity.User;
 import com.jeesite.modules.sys.entity.UserDataScope;
 import com.jeesite.modules.sys.service.EmpUserService;
@@ -68,6 +70,8 @@ public class EmpUserController extends BaseController {
 	private UserService userService;
 	@Autowired
 	private RoleService roleService;
+	@Autowired
+	private HwFileService hwFileService;
 
 	@ModelAttribute
 	public EmpUser get(String userCode, boolean isNewRecord) {
@@ -132,18 +136,50 @@ public class EmpUserController extends BaseController {
 		
 		// 获取当前编辑用户的角色和权限
 		if (StringUtils.inString(op, Global.OP_AUTH)) {
-			
 			// 获取当前用户所拥有的角色
 			Role role = new Role();
 			role.setUserCode(empUser.getUserCode());
 			model.addAttribute("roleList", roleService.findListByUserCode(role));
 
 		}
+
+
 		// 操作类型：add: 全部； edit: 编辑； auth: 授权
 		model.addAttribute("op", op);
 		model.addAttribute("empUser", empUser);
+		model.addAttribute("hwFileList",hwFileService.findHwFileByLoginCode(empUser.getLoginCode()));
 		return "modules/sys/user/empUserForm";
 	}
+
+	@RequiresPermissions("sys:empUser:view")
+	@RequestMapping(value = "hw")
+	@ResponseBody
+	public Page<HwFile> hwListData(HwFile hwFile,@RequestParam("loginCode") String loginCode, HttpServletRequest request, HttpServletResponse response) {
+		Page<HwFile> page = new Page<HwFile>();//loginCode
+		hwFile.setPage(new Page<>(request, response));
+
+		System.out.println("@#-----------------------:"+loginCode);
+		//获取当前用户的华为证书
+
+//		HwFile hwFile = new HwFile();
+		hwFile.setFileHolder(loginCode);
+		System.out.println("查询证书获取到登录账号：" + hwFile.getFileHolder());
+		List<HwFile> hwFileList = hwFileService.findHwFileByLoginCode(hwFile.getFileHolder());
+
+		page.setList(hwFileList);
+		System.out.println("----------page.getList()=:"+page.getList());    // 获取当前页数据
+//		model.addAttribute("hwFileList", hwFileService.findHwFileByLoginCode(hwFile.getFileHolder());
+
+		for (HwFile hw : hwFileList) {
+			System.out.println("证书持有者：" + hw.getFileHolder());
+			System.out.println("证书方向：" + hw.getFileDirection());
+			System.out.println("证书名称：" + hw.getFileName());
+
+		}
+		return page;
+	}
+
+
 
 	@RequiresPermissions(value={"sys:empUser:edit","sys:empUser:authRole"}, logical=Logical.OR)
 	@PostMapping(value = "save")

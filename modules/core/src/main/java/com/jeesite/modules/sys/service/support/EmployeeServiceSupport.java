@@ -32,6 +32,7 @@ public class EmployeeServiceSupport extends CrudService<EmployeeDao, Employee>
 	private EmployeePostDao employeePostDao;
 	@Autowired
 	private EmployeeOfficeDao employeeOfficeDao;
+
 	
 	/**
 	 * 获取单条数据
