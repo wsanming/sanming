@@ -6,7 +6,6 @@ package com.jeesite.modules.sys.service.filemanager;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.jeesite.common.shiro.e.H;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 /**
  * 华为证书表Service
  * @author xuqx
- * @version 2020-01-14
+ * @version 2020-02-02
  */
 @Service
 @Transactional(readOnly=true)
@@ -81,17 +80,17 @@ public class HwFileService extends CrudService<HwFileDao, HwFile> {
 		super.delete(hwFile);
 	}
 
+
+	/**
+	 * @param loginCode
+	 * @return
+	 * 根据登录账号查询证书
+	 */
 	@Transactional(readOnly = true)
 	public List<HwFile> findHwFileByLoginCode(@RequestParam String loginCode){
 		List<HwFile> hwFileList = new ArrayList<HwFile>();
 		hwFileList = hwFileDao.findHwFileByLoginCode(loginCode);
 		return hwFileList;
-	}
-	@Transactional(readOnly = true)
-	public HwFile findHwFileById(@RequestParam Long fileId){
-		HwFile hwFile = new HwFile();
-		hwFile = hwFileDao.findHwFileById(fileId);
-		return hwFile;
 	}
 
 }

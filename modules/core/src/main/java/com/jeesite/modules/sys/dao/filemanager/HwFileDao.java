@@ -13,16 +13,13 @@ import java.util.List;
 /**
  * 华为证书表DAO接口
  * @author xuqx
- * @version 2020-01-14
+ * @version 2020-02-02
  */
 @MyBatisDao
 public interface HwFileDao extends CrudDao<HwFile> {
-/**
- * 根据登录账号查询证书
- * */
-    public List<HwFile> findHwFileByLoginCode(@RequestParam String loginCode);
     /**
-     * 根据证书id查询证书
-     */
-    public HwFile findHwFileById(@RequestParam Long fileId);
+     * 根据登录账号查询证书
+     * */
+    public List<HwFile> findHwFileByLoginCode(@RequestParam String loginCode);
+	
 }

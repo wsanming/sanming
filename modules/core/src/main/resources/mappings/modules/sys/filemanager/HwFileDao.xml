@@ -11,19 +11,11 @@
 		</where>
 		ORDER BY ${sqlMap.order.toSql()}
 	</select> -->
-<!--	根据登录账号查询证书-->
+	<!--	根据登录账号查询证书-->
 	<select id="findHwFileByLoginCode" resultType="HwFile">
 		select *
 		from ${_prefix}sys_hw_file f
 		where
-			f.file_holder = #{userName}
+			f.certificate_holder = #{userName}
 	</select>
-<!--	根据证书id查找证书-->
-	<select id="findHwFileById" resultType="HwFile">
-		select *
-		from ${_prefix}sys_hw_file f
-		where
-			f.file_id = #{fileId}
-	</select>
-	
 </mapper>

@@ -183,9 +183,9 @@
                         <label class="control-label col-sm-2" title="">
                             <span class="required hide">*</span> ${text('已有证书')}：<i
                                 class="fa icon-question hide"></i></label>
+                        <button id="btnDownload" class="btn btn-info btn-xs blue"><i class=" fa fa-download"></i>批量下载</button>
                         <div class="col-sm-10" id="hw">
-                            <!--							<iframe src="${ctx}/sys/filemanager/hwFile/list" frameborder="0" width="100%"></iframe>-->
-                            <table id="dataGrid"></table>
+                            <table id="dataGrid"> </table>
                             <div id="dataGridPage"></div>
 
                         </div>
@@ -283,7 +283,6 @@
             </div>
         </div>
     </#form:form>
-
 </div>
 <#form:form id="searchForm" model="${hwFileList}" action="${ctx}/sys/empUser/hw?loginCode=${empUser.loginCode}" method="get" class="form-inline hide"
 data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-order-by="${parameter.orderBy}">
@@ -415,6 +414,10 @@ data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-o
     // console.log($("#searchForm"));
     // 初始化DataGrid对象
     $('#dataGrid').dataGrid({
+        //显示复选框
+        showCheckbox:true,
+
+
         searchForm: $("#searchForm"),
         columnModel: [
             {
@@ -425,35 +428,51 @@ data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-o
                 align: "center",
                 frozen: true,
                 formatter: function (val, obj, row, act) {
-                    return '<a href="${ctx}/sys/filemanager/hwFile/form?fileId=' + row.fileId + '" class="btnList" data-title="${text("编辑华为证书")}">' + (val || row.id) + '</a>';
+                    return '<a href="${ctx}/sys/filemanager/hwFile/form?certificateId=' + row.certificateId + '" class="btnList" data-title="${text("编辑华为证书")}">' + (val || row.id) + '</a>';
                 }
             },
-            {header: '${text("证书方向")}', name: 'fileDirection', index: 'a.file_direction', width: 150, align: "center"},
-            {header: '${text("证书等级")}', name: 'fileLevel', index: 'a.file_level', width: 150, align: "center"},
-            {header: '${text("证书持有者")}', name: 'fileHolder', index: 'a.file_holder', width: 150, align: "center"},
-            {header: '${text("证书到期时间")}', name: 'fileDate', index: 'a.file_date', width: 150, align: "center"},
+            {header: '${text("证书方向")}', name: 'certificateDirection', index: 'a.certificate_direction', width: 150, align: "center"},
+            {header: '${text("证书等级")}', name: 'certificateLevel', index: 'a.certificate_level', width: 150, align: "center"},
+            {header: '${text("证书持有者")}', name: 'certificateHolder', index: 'a.certificate_holder', width: 150, align: "center"},
+            {header: '${text("证书到期时间")}', name: 'certificateDate', index: 'a.certificate_date', width: 150, align: "center"},
+            {header: '${text("文件路径")}', name: 'filePath', index: 'a.file_path', width: 150, align: "center"},
+            {header:'${text("备注")}', name:'remarks', index:'a.remarks', width:150, align:"left"},
+            // {
+            //     header: '${text("下载")}',
+            //     name: 'filePath',
+            //     index: 'a.file_path',
+            //     width: 150,
+            //     align: "center",
+            //     frozen: true,
+            //     formatter: function (val, obj, row, act) {
+            //         // alert(row.fileName)
+            //         return '<a target="_blank" href="'+val+'" class="btn btn-info btn-xs blue" ><i class="fa fa-download"></i>下载</a>';
+            //     }
+            // },
+
             {
                 header: '${text("操作")}',
                 name: 'actions',
                 width: 150,
+                align: "center",
                 sortable: false,
                 title: false,
                 formatter: function (val, obj, row, act) {
                     var actions = [];
-                <%
-                    if (hasPermi('sys:filemanager:hwFile:edit')) { %>
-                        actions.push('<a href="${ctx}/sys/filemanager/hwFile/form?fileId=' + row.fileId + '" class="btnList" title="${text("编辑华为证书")}"><i class="fa fa-pencil"></i></a>&nbsp;');
-                        if (row.status == Global.STATUS_NORMAL) {
-                            actions.push('<a href="${ctx}/sys/filemanager/hwFile/disable?fileId=' + row.fileId + '" class="btnList" title="${text("停用华为证书")}" data-confirm="${text("确认要停用该华为证书吗？")}"><i class="glyphicon glyphicon-ban-circle"></i></a>&nbsp;');
+                <% if(hasPermi('sys:filemanager:hwFile:edit')){ %>
+                        actions.push('<a href="${ctx}/sys/filemanager/hwFile/form?certificateId='+row.certificateId+'" class="btnList" title="${text("编辑华为证书")}"><i class="fa fa-pencil"></i></a>&nbsp;');
+                        if (row.status == Global.STATUS_NORMAL){
+                            actions.push('<a href="${ctx}/sys/filemanager/hwFile/disable?certificateId='+row.certificateId+'" class="btnList" title="${text("停用华为证书")}" data-confirm="${text("确认要停用该华为证书吗？")}"><i class="glyphicon glyphicon-ban-circle"></i></a>&nbsp;');
                         }
-                        if (row.status == Global.STATUS_DISABLE) {
-                            actions.push('<a href="${ctx}/sys/filemanager/hwFile/enable?fileId=' + row.fileId + '" class="btnList" title="${text("启用华为证书")}" data-confirm="${text("确认要启用该华为证书上传吗？")}"><i class="glyphicon glyphicon-ok-circle"></i></a>&nbsp;');
+                        if (row.status == Global.STATUS_DISABLE){
+                            actions.push('<a href="${ctx}/sys/filemanager/hwFile/enable?certificateId='+row.certificateId+'" class="btnList" title="${text("启用华为证书")}" data-confirm="${text("确认要启用该华为证书吗？")}"><i class="glyphicon glyphicon-ok-circle"></i></a>&nbsp;');
                         }
-                        actions.push('<a href="${ctx}/sys/filemanager/hwFile/delete?fileId=' + row.fileId + '" class="btnList" title="${text("删除华为证书")}" data-confirm="${text("确认要删除该华为证书上传吗？")}"><i class="fa fa-trash-o"></i></a>&nbsp;');
-                        actions.push('<a href="${ctx}/sys/filemanager/hwFile/download?fileId=' + row.fileId + '" class="btnList" title="${text("下载华为证书")}"><i class="fa fa-download"></i></a>&nbsp;');
-                    <%
-                    }
-                %>
+                        actions.push('<a href="${ctx}/sys/filemanager/hwFile/delete?certificateId='+row.certificateId+'" class="btnList" title="${text("删除华为证书")}" data-confirm="${text("确认要删除该华为证书吗？")}"><i class="fa fa-trash-o"></i></a>&nbsp;');
+                        // actions.push('<a href="${ctx}/sys/filemanager/FileDownLoad/download?certificateId='+row.certificateId+'" class="btnList" title="${text("下载华为证书")}" data-confirm="${text("确认要下载该华为证书吗？")}"><i class="fa fa-download"></i></a>&nbsp;');
+
+                        // actions.push('<a target="_blank" href="/js/userfiles/fileupload/202001/1215928295040294913.pdf" class="btnList" title="${text("下载华为证书")}" data-confirm="${text("确认要下载该华为证书吗？")}"><i class="fa fa-download"></i></a>&nbsp;');
+
+                    <% } %>
                     return actions.join('');
                 }
             }
@@ -464,3 +483,42 @@ data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-o
         }
     });
 </script>
+
+<script>
+    $("#btnDownload").click(function(){
+        var rows = $("#dataGrid").dataGrid("getSelectRows");
+        // alert(rows)
+        if(rows.length<1){
+        alert("请选择要下载的证书")
+            return false
+    }else {
+            // var urls = new Array();
+            for (var i = 0; i < rows.length; i++) {
+                var id = rows[i];
+                var rowData = $("#dataGrid").dataGrid("getRowData", id);
+                // alert(rowData)
+
+                // urls[i] = rowData.filePath;
+                var filePath = rowData.filePath;
+                // alert(filePath)
+                var fileName = rowData.fileName;
+                download(fileName, filePath);
+            }
+
+
+        }
+
+    });
+    function download(fileName,filePath){
+        var a = document.createElement("a"),
+            e = document.createEvent("MouseEvents");
+        e.initEvent("click",false,false);
+        a.href = filePath;
+        a.download=fileName;
+        a.dispatchEvent(e);
+
+    }
+
+
+</script>
+

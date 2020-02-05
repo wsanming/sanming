@@ -162,17 +162,17 @@ public class EmpUserController extends BaseController {
 		//获取当前用户的华为证书
 
 //		HwFile hwFile = new HwFile();
-		hwFile.setFileHolder(loginCode);
-		System.out.println("查询证书获取到登录账号：" + hwFile.getFileHolder());
-		List<HwFile> hwFileList = hwFileService.findHwFileByLoginCode(hwFile.getFileHolder());
+		hwFile.setCertificateHolder(loginCode);
+		System.out.println("查询证书获取到登录账号：" + hwFile.getCertificateHolder());
+		List<HwFile> hwFileList = hwFileService.findHwFileByLoginCode(hwFile.getCertificateHolder());
 
 		page.setList(hwFileList);
 		System.out.println("----------page.getList()=:"+page.getList());    // 获取当前页数据
 //		model.addAttribute("hwFileList", hwFileService.findHwFileByLoginCode(hwFile.getFileHolder());
 
 		for (HwFile hw : hwFileList) {
-			System.out.println("证书持有者：" + hw.getFileHolder());
-			System.out.println("证书方向：" + hw.getFileDirection());
+			System.out.println("证书持有者：" + hw.getCertificateHolder());
+			System.out.println("证书方向：" + hw.getCertificateDirection());
 			System.out.println("证书名称：" + hw.getFileName());
 
 		}
