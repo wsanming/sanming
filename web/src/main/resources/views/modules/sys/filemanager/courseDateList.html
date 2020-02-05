@@ -1,0 +1,146 @@
+<% layout('/layouts/default.html', {title: '课程资料表管理', libs: ['dataGrid']}){ %>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header">
+			<div class="box-title">
+				<i class="fa icon-notebook"></i> ${text('课程资料表管理')}
+			</div>
+			<div class="box-tools pull-right">
+				<a href="#" class="btn btn-default" id="btnSearch" title="${text('查询')}"><i class="fa fa-filter"></i> ${text('查询')}</a>
+				<% if(hasPermi('sys:filemanager:courseDate:edit')){ %>
+				<a href="${ctx}/sys/filemanager/courseDate/form" class="btn btn-default btnTool" title="${text('新增课程资料表')}"><i class="fa fa-plus"></i> ${text('新增')}</a>
+				<% } %>
+				<a target="_blank" class="btn btn-default" id="btnDownload" title="${text('下载')}"><i class="fa fa-download"></i> ${text('下载')}</a>
+			</div>
+		</div>
+		<div class="box-body">
+			<#form:form id="searchForm" model="${courseDate}" action="${ctx}/sys/filemanager/courseDate/listData" method="post" class="form-inline hide"
+			data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-order-by="${parameter.orderBy}">
+			<div class="form-group">
+				<label class="control-label">${text('课程名称')}：</label>
+				<div class="control-inline">
+					<#form:input path="courseName" maxlength="255" class="form-control width-120"/>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="control-label">${text('课程方向 ')}：</label>
+				<div class="control-inline width-120">
+					<#form:select path="courseType" dictType="sys_course_type" blankOption="true" class="form-control"/>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="control-label">${text('是否存在文件')}：</label>
+				<div class="control-inline width-120">
+					<#form:select path="isExistsFile" dictType="sys_yes_no" blankOption="true" class="form-control"/>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="control-label">${text('文件路径')}：</label>
+				<div class="control-inline">
+					<#form:input path="filePath" maxlength="64" class="form-control width-120"/>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="control-label">${text('文件名称')}：</label>
+				<div class="control-inline">
+					<#form:input path="fileName" maxlength="500" class="form-control width-120"/>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="control-label">${text('状态')}：</label>
+				<div class="control-inline width-120">
+					<#form:select path="status" dictType="sys_search_status" blankOption="true" class="form-control"/>
+				</div>
+			</div>
+			<div class="form-group">
+				<button type="submit" class="btn btn-primary btn-sm">${text('查询')}</button>
+				<button type="reset" class="btn btn-default btn-sm">${text('重置')}</button>
+			</div>
+		</#form:form>
+		<table id="dataGrid"></table>
+		<div id="dataGridPage"></div>
+	</div>
+</div>
+</div>
+<% } %>
+<script>
+	// 初始化DataGrid对象
+	$('#dataGrid').dataGrid({
+		searchForm: $("#searchForm"),
+		columnModel: [
+			{header:'${text("课程名称")}', name:'courseName', index:'a.course_name', width:150, align:"left", frozen:true, formatter: function(val, obj, row, act){
+					return '<a href="${ctx}/sys/filemanager/courseDate/form?id='+row.id+'" class="btnList" data-title="${text("编辑课程资料表")}">'+(val||row.id)+'</a>';
+				}},
+			{header:'${text("课程方向 ")}', name:'courseType', index:'a.course_type', width:150, align:"center", formatter: function(val, obj, row, act){
+					return js.getDictLabel(${@DictUtils.getDictListJson('sys_course_type')}, val, '${text("未知")}', true);
+				}},
+			{header:'${text("是否存在文件")}', name:'isExistsFile', index:'a.is_exists_file', width:150, align:"center", formatter: function(val, obj, row, act){
+					return js.getDictLabel(${@DictUtils.getDictListJson('sys_yes_no')}, val, '${text("未知")}', true);
+				}},
+			{header:'${text("文件名称")}', name:'fileName', index:'a.file_name', width:150, align:"left", hidden:true},
+			{header:'${text("文件路径")}', name:'filePath', index:'a.file_path', width:150, align:"left", hidden:true},
+			{header:'${text("状态")}', name:'status', index:'a.status', width:150, align:"center", formatter: function(val, obj, row, act){
+					return js.getDictLabel(${@DictUtils.getDictListJson('sys_search_status')}, val, '${text("未知")}', true);
+				}},
+			{header:'${text("更新时间")}', name:'updateDate', index:'a.update_date', width:150, align:"center"},
+			{header:'${text("备注信息")}', name:'remarks', index:'a.remarks', width:150, align:"left"},
+			{header:'${text("操作")}', name:'actions', width:120, sortable:false, title:false, formatter: function(val, obj, row, act){
+					var actions = [];
+				<% if(hasPermi('sys:filemanager:courseDate:edit')){ %>
+						actions.push('<a href="${ctx}/sys/filemanager/courseDate/form?id='+row.id+'" class="btnList" title="${text("编辑课程资料表")}"><i class="fa fa-pencil"></i></a>&nbsp;');
+						if (row.status == Global.STATUS_NORMAL){
+							actions.push('<a href="${ctx}/sys/filemanager/courseDate/disable?id='+row.id+'" class="btnList" title="${text("停用课程资料表")}" data-confirm="${text("确认要停用该课程资料表吗？")}"><i class="glyphicon glyphicon-ban-circle"></i></a>&nbsp;');
+						}
+						if (row.status == Global.STATUS_DISABLE){
+							actions.push('<a href="${ctx}/sys/filemanager/courseDate/enable?id='+row.id+'" class="btnList" title="${text("启用课程资料表")}" data-confirm="${text("确认要启用该课程资料表吗？")}"><i class="glyphicon glyphicon-ok-circle"></i></a>&nbsp;');
+						}
+						actions.push('<a href="${ctx}/sys/filemanager/courseDate/delete?id='+row.id+'" class="btnList" title="${text("删除课程资料表")}" data-confirm="${text("确认要删除该课程资料表吗？")}"><i class="fa fa-trash-o"></i></a>&nbsp;');
+					<% } %>
+					return actions.join('');
+				}}
+		],
+		showCheckbox: true, // 显示复选框
+
+		// onSelectRow: function (rowId, status, e) {
+		//
+		// },
+		// onSelectAll:function(rowids,statue){
+		//
+		// },
+		// 加载成功后执行事件
+		ajaxSuccess: function(data){
+
+		}
+	});
+
+	//下载按钮点击事件
+	$('#btnDownload').click (function () {
+		var ids = $('#dataGrid').dataGrid('getSelectRows');
+		if (ids.length <= 0){
+			js.showMessage('请选择要下载的文件');
+			return false;
+		}
+		for (var index = 0; index < ids.length; index++) {
+			var id =ids[index];
+			var rowData =$('#dataGrid').dataGrid('getRowData', id);
+			var filePath =rowData.filePath;
+			var fileName =rowData.fileName;
+			if (filePath=="" ||filePath.length<=0) {
+				continue;
+			} else {
+				download(fileName, filePath);
+			}
+		}
+	});
+
+	// 文件下载
+	function download(name, href) {
+		var a = document.createElement("a"), //创建a标签
+				e = document.createEvent("MouseEvents"); //创建鼠标事件对象
+		e.initEvent("click", false, false); //初始化事件对象
+		a.href = href; //设置下载地址
+		a.download = name; //设置下载文件名
+		a.dispatchEvent(e); //给指定的元素，执行事件click事件
+	}
+
+</script>
