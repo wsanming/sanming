@@ -77,7 +77,6 @@ public class CourseDateController extends BaseController {
 	@RequestMapping(value = "listData")
 	@ResponseBody
 	public Page<CourseDate> listData(CourseDate courseDate, HttpServletRequest request, HttpServletResponse response) {
-		System.out.println("----------courseDate=:"+courseDate.toString());
 		Page<CourseDate> page = new Page<CourseDate>();
 		courseDate.setPage(new Page<>(request, response));// 给实体设置 page 参数即可自动分页
 		List<CourseDate> list = courseDateService.findList(courseDate);
@@ -98,20 +97,8 @@ public class CourseDateController extends BaseController {
 	}
 
 	/**
-	 * 下载课程资料表
-	 */
-	@RequiresPermissions("sys:filemanager:courseDate:edit")
-	@PostMapping(value = "download")
-	@ResponseBody
-	public String  download(CourseDate courseDate, HttpServletRequest request, HttpServletResponse response) throws Exception {
-
-		return renderResult(Global.TRUE, text("下载课程资料表成功！"));
-
-	}
-
-		/**
-         * 保存课程资料表
-         */
+    * 保存课程资料表
+    */
 	@RequiresPermissions("sys:filemanager:courseDate:edit")
 	@PostMapping(value = "save")
 	@ResponseBody

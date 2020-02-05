@@ -33,7 +33,7 @@
 					</div>
 				</div>
 			</div>
-			<div class="row">
+			<div class="row" hidden="hidden">
 				<div class="col-xs-6">
 					<div class="form-group">
 						<label class="control-label col-sm-4" title="">
@@ -112,6 +112,11 @@
 </div>
 <% } %>
 <script>
+	window.onload=function(){
+		//初始化内容
+		isExists();
+	}
+	
 	$("#inputForm").validate({
 		submitHandler: function(form){
 			js.ajaxSubmitForm($(form), function(data){
@@ -124,5 +129,17 @@
 			}, "json");
 		}
 	});
-	console.info($('#uploadFileUploader').serialize());//1215919746734206976
+
+	function isExists() {
+		if($("#filePath").val() !="" || $("#filePath").val().length>0){
+			$('#isExistsFile option:eq(0)').prop('selected', 'selected');
+		}else{
+			//$('#isExistsFile option:eq(1)').prop('selected', 'selected');
+			$("#isExistsFile").val("0");
+		}
+	}
+	$("#filePath").change(function(){
+		isExists();
+	});
+
 </script>

@@ -10,13 +10,12 @@
 				<% if(hasPermi('sys:filemanager:courseDate:edit')){ %>
 				<a href="${ctx}/sys/filemanager/courseDate/form" class="btn btn-default btnTool" title="${text('新增课程资料表')}"><i class="fa fa-plus"></i> ${text('新增')}</a>
 				<% } %>
+				<a target="_blank" class="btn btn-default" id="btnDownload" title="${text('下载')}"><i class="fa fa-download"></i> ${text('下载')}</a>
 			</div>
 		</div>
 		<div class="box-body">
 			<#form:form id="searchForm" model="${courseDate}" action="${ctx}/sys/filemanager/courseDate/listData" method="post" class="form-inline hide"
 			data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-order-by="${parameter.orderBy}">
-			<!--			${courseDate}-->
-			<!--			${courseDate}-->
 			<div class="form-group">
 				<label class="control-label">${text('课程名称')}：</label>
 				<div class="control-inline">
@@ -36,9 +35,9 @@
 				</div>
 			</div>
 			<div class="form-group">
-				<label class="control-label">${text('文件编号')}：</label>
+				<label class="control-label">${text('文件路径')}：</label>
 				<div class="control-inline">
-					<#form:input path="fileId" maxlength="64" class="form-control width-120"/>
+					<#form:input path="filePath" maxlength="64" class="form-control width-120"/>
 				</div>
 			</div>
 			<div class="form-group">
@@ -89,7 +88,6 @@
 					var actions = [];
 				<% if(hasPermi('sys:filemanager:courseDate:edit')){ %>
 						actions.push('<a href="${ctx}/sys/filemanager/courseDate/form?id='+row.id+'" class="btnList" title="${text("编辑课程资料表")}"><i class="fa fa-pencil"></i></a>&nbsp;');
-						actions.push('<a id="btnDownload" href="${ctx}/sys/filemanager/courseDate/download?id='+row.id+'" class="btnList" title="${text("下载课程资料表")}" data-confirm="${text("确认要下载该课程资料表吗？")}"><i class="fa fa-download"></i></a>&nbsp;');
 						if (row.status == Global.STATUS_NORMAL){
 							actions.push('<a href="${ctx}/sys/filemanager/courseDate/disable?id='+row.id+'" class="btnList" title="${text("停用课程资料表")}" data-confirm="${text("确认要停用该课程资料表吗？")}"><i class="glyphicon glyphicon-ban-circle"></i></a>&nbsp;');
 						}
@@ -101,17 +99,48 @@
 					return actions.join('');
 				}}
 		],
+		showCheckbox: true, // 显示复选框
+
+		// onSelectRow: function (rowId, status, e) {
+		//
+		// },
+		// onSelectAll:function(rowids,statue){
+		//
+		// },
 		// 加载成功后执行事件
 		ajaxSuccess: function(data){
 
 		}
 	});
-	console.info($("#searchForm").serialize());
 
-	// ${ctx}/sys/filemanager/courseDate/download?id='+row.id+'
-	$('#btnDownload').click(function(){
-		alert(232);
+	//下载按钮点击事件
+	$('#btnDownload').click (function () {
+		var ids = $('#dataGrid').dataGrid('getSelectRows');
+		if (ids.length <= 0){
+			js.showMessage('请选择要下载的文件');
+			return false;
+		}
+		for (var index = 0; index < ids.length; index++) {
+			var id =ids[index];
+			var rowData =$('#dataGrid').dataGrid('getRowData', id);
+			var filePath =rowData.filePath;
+			var fileName =rowData.fileName;
+			if (filePath=="" ||filePath.length<=0) {
+				continue;
+			} else {
+				download(fileName, filePath);
+			}
+		}
 	});
 
+	// 文件下载
+	function download(name, href) {
+		var a = document.createElement("a"), //创建a标签
+				e = document.createEvent("MouseEvents"); //创建鼠标事件对象
+		e.initEvent("click", false, false); //初始化事件对象
+		a.href = href; //设置下载地址
+		a.download = name; //设置下载文件名
+		a.dispatchEvent(e); //给指定的元素，执行事件click事件
+	}
 
 </script>
