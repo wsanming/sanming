@@ -102,36 +102,66 @@
 		showCheckbox: true, // 显示复选框
 
 		// onSelectRow: function (rowId, status, e) {
-		//
+		// 	alert("单选")
 		// },
 		// onSelectAll:function(rowids,statue){
-		//
+		// 	alert("多选")
 		// },
+
 		// 加载成功后执行事件
 		ajaxSuccess: function(data){
 
 		}
 	});
 
+	//全局变量
+	var nameList = [], pathList = [], courseNameList = [];
+
 	//下载按钮点击事件
 	$('#btnDownload').click (function () {
 		var ids = $('#dataGrid').dataGrid('getSelectRows');
+		nameList = [], pathList = [], courseNameList = [];
+
 		if (ids.length <= 0){
 			js.showMessage('请选择要下载的文件');
 			return false;
-		}
-		for (var index = 0; index < ids.length; index++) {
-			var id =ids[index];
-			var rowData =$('#dataGrid').dataGrid('getRowData', id);
-			var filePath =rowData.filePath;
-			var fileName =rowData.fileName;
-			if (filePath=="" ||filePath.length<=0) {
-				continue;
-			} else {
-				download(fileName, filePath);
+		} else {
+			for (var index = 0; index < ids.length; index++) {
+				var id =ids[index];
+				var rowData =$('#dataGrid').dataGrid('getRowData', id);
+				var filePath = rowData.filePath;
+				if (filePath=="" || filePath.length<=0) {
+					continue;
+				} else {
+					var fileName = rowData.fileName;
+					var courseName = rowData.courseName;
+					var start = courseName.indexOf(">");
+					var end =  courseName.lastIndexOf("<");
+					courseName= courseName.substring(start+1,end);
+					//alert("courseName: " + courseName);
+
+					if(filePath.indexOf("|") != -1 || fileName.indexOf("|") != -1) {
+						var filePaths = filePath.split("|");
+						var fileNames = fileName.split("|");
+						for (var i = 0; i<filePaths.length; i++) {
+							addParmas(filePaths[i], fileNames[i], courseName);
+						}
+					} else {
+						addParmas(filePath, fileName, courseName);
+					}
+				}
 			}
+			batchDownload(pathList,nameList,courseNameList)
 		}
 	});
+
+	//参数添加进list
+	function addParmas(filePath, fileName, courseName) {
+		filePath = filePath.substring(3);  // 去掉/js
+		pathList.push(filePath);
+		nameList.push(fileName);
+		courseNameList.push(courseName);
+	}
 
 	// 文件下载
 	function download(name, href) {
@@ -141,6 +171,21 @@
 		a.href = href; //设置下载地址
 		a.download = name; //设置下载文件名
 		a.dispatchEvent(e); //给指定的元素，执行事件click事件
+	}
+
+	function batchDownload(pathList, nameList, courseNameList) {
+		if (pathList.length == 1){
+			// alert("单个下载："+pathList.length);
+			var filePath ="/js"+pathList[0]; //单个下载，需加上/js
+			download(nameList[0], filePath);
+		} else {
+			// alert("批量下载："+pathList.length);
+			var paths =  encodeURI(encodeURI(pathList));
+			var names = encodeURI(encodeURI(nameList));
+			var courseNames = encodeURI(encodeURI(courseNameList));
+			//将名称传入后台
+			window.location.href = "${ctx}/sys/filemanager/courseDate/download?names="+names+"&paths="+paths+"&courseNames="+courseNames;
+		}
 	}
 
 </script>

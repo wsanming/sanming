@@ -3,24 +3,17 @@
  */
 package com.jeesite.modules.sys.service.filemanager;
 
-import com.jeesite.common.codec.EncodeUtils;
 import com.jeesite.common.entity.Page;
-import com.jeesite.common.lang.DateUtils;
 import com.jeesite.common.service.CrudService;
+import com.jeesite.common.utils.FileDownloadUtils;
 import com.jeesite.modules.file.utils.FileUploadUtils;
 import com.jeesite.modules.sys.dao.filemanager.CourseDateDao;
 import com.jeesite.modules.sys.entity.filemanager.CourseDate;
-import org.apache.tools.zip.ZipEntry;
-import org.apache.tools.zip.ZipOutputStream;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -91,6 +84,19 @@ public class CourseDateService extends CrudService<CourseDateDao, CourseDate> {
 	@Transactional(readOnly=false)
 	public void delete(CourseDate courseDate) {
 		super.delete(courseDate);
+	}
+
+	/**
+	 * 文件下载
+	 * @param request
+	 * @param response
+	 * @param names
+	 * @param paths
+	 * @param courseNames
+	 */
+	@Transactional(readOnly=false)
+	public void download(HttpServletRequest request, HttpServletResponse response, String [] names, String [] paths, String[] courseNames) {
+		FileDownloadUtils.downloadFile2Zip( request,  response, names, paths, courseNames);
 	}
 
 }

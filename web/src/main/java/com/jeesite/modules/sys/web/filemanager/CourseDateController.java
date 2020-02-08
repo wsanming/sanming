@@ -3,17 +3,12 @@
  */
 package com.jeesite.modules.sys.web.filemanager;
 
-import com.jeesite.common.codec.EncodeUtils;
-import com.jeesite.common.collect.ListUtils;
 import com.jeesite.common.config.Global;
 import com.jeesite.common.entity.Page;
 import com.jeesite.common.web.BaseController;
 import com.jeesite.modules.sys.entity.filemanager.CourseDate;
 import com.jeesite.modules.sys.service.filemanager.CourseDateService;
-import com.sun.media.jfxmedia.locator.Locator;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.apache.tools.zip.ZipEntry;
-import org.apache.tools.zip.ZipOutputStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,9 +17,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.io.UnsupportedEncodingException;
+import java.util.List;
 
 /**
  * 课程资料表Controller
@@ -140,6 +134,17 @@ public class CourseDateController extends BaseController {
 	public String delete(CourseDate courseDate) {
 		courseDateService.delete(courseDate);
 		return renderResult(Global.TRUE, text("删除课程资料表成功！"));
+	}
+
+	/**
+	 * 文件下载
+	 * @param response
+	 * @param names
+	 * @param paths
+	 */
+	@RequestMapping(value = "download")
+	public void download(HttpServletRequest request, HttpServletResponse response, String [] names, String [] paths, String[] courseNames) throws UnsupportedEncodingException {
+		courseDateService.download( request,  response, names, paths,courseNames);
 	}
 
 }
