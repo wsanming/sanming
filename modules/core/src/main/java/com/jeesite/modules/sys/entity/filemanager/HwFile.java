@@ -143,7 +143,7 @@ public class HwFile extends DataEntity<HwFile> {
 		this.creatBy = creatBy;
 	}
 	
-//	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 //	@NotNull(message="上传证书时间不能为空")
 	public Date getCreatDate() {
 		return creatDate;

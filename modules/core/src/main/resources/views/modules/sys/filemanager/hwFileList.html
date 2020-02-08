@@ -13,6 +13,7 @@
 			</div>
 		</div>
 		<div class="box-body">
+			<a  id="btnDownload" class="btnList" title="${text('支持批量下载')}"><i class="fa fa-download"></i>下载</a>
 			<#form:form id="searchForm" model="${hwFile}" action="${ctx}/sys/filemanager/hwFile/listData" method="post" class="form-inline hide"
 					data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-order-by="${parameter.orderBy}">
 				<div class="form-group">
@@ -109,23 +110,29 @@
 <script>
 // 初始化DataGrid对象
 $('#dataGrid').dataGrid({
+	//显示复选框
+	showCheckbox:true,
+
 	searchForm: $("#searchForm"),
 	columnModel: [
-		{header:'${text("文件名称")}', name:'fileName', index:'a.file_name', width:150, align:"left", frozen:true, formatter: function(val, obj, row, act){
-			return '<a href="${ctx}/sys/filemanager/hwFile/form?certificateId='+row.certificateId+'" class="btnList" data-title="${text("编辑华为证书")}">'+(val||row.id)+'</a>';
-		}},
+		{header:'${text("文件名称")}', name:'fileName', index:'a.file_name', width:150, align:"left",
+		//frozen:true, formatter: function(val, obj, row, act){
+		// 	return '<a href="${ctx}/sys/filemanager/hwFile/form?certificateId='+row.certificateId+'" class="btnList" data-title="${text("编辑华为证书")}">'+(val||row.id)+'</a>';
+		// }
+		},
 		{header:'${text("证书名称")}', name:'certificateName', index:'a.certificate_name', width:150, align:"left"},
 		{header:'${text("证书方向")}', name:'certificateDirection', index:'a.certificate_direction', width:150, align:"left"},
 		{header:'${text("证书等级")}', name:'certificateLevel', index:'a.certificate_level', width:150, align:"left"},
 		{header:'${text("证书持有者")}', name:'certificateHolder', index:'a.certificate_holder', width:150, align:"left"},
 		{header:'${text("证书到期时间")}', name:'certificateDate', index:'a.certificate_date', width:150, align:"center"},
-		{header:'${text("上传证书者")}', name:'creatBy', index:'a.creat_by', width:150, align:"left"},
-		{header:'${text("上传证书时间")}', name:'creatDate', index:'a.creat_date', width:150, align:"center"},
-		{header:'${text("更新证书时间")}', name:'updateDate', index:'a.update_date', width:150, align:"center"},
+		{header: '${text("文件路径")}', name: 'filePath', index: 'a.file_path', width: 150, align: "center" ,hidden:true},
+		// {header:'${text("上传证书者")}', name:'creatBy', index:'a.creat_by', width:150, align:"left"},
+		// {header:'${text("上传证书时间")}', name:'creatDate', index:'a.creat_date', width:150, align:"center"},
+		// {header:'${text("更新证书时间")}', name:'updateDate', index:'a.update_date', width:150, align:"center"},
 		// {header:'${text("文件路径")}', name:'filePath', index:'a.file_path', width:150, align:"left"},
 		// {header:'${text("证书是否存在")}', name:'isExists', index:'a.is_exists', width:150, align:"left"},
 		// {header:'${text("文件扩展名")}', name:'fileExtension', index:'a.file_extension', width:150, align:"left"},
-		{header:'${text("状态")}', name:'fileStatus', index:'a.file_status', width:150, align:"left"},
+		// {header:'${text("状态")}', name:'fileStatus', index:'a.file_status', width:150, align:"left"},
 		{header:'${text("备注")}', name:'remarks', index:'a.remarks', width:150, align:"left"},
 		{header:'${text("操作")}', name:'actions', width:120, sortable:false, title:false, formatter: function(val, obj, row, act){
 			var actions = [];
@@ -147,4 +154,65 @@ $('#dataGrid').dataGrid({
 		
 	}
 });
+</script>
+<script>
+
+	$("#btnDownload").click(function(){
+		var rows = $("#dataGrid").dataGrid("getSelectRows");
+		// alert(rows)
+		if(rows.length<1){
+			alert("请选择要下载的证书")
+			return false
+		} else if(rows.length>1){
+
+			var nameList = [];
+			var pathList = [];
+			for (var index = 0; index < rows.length; index++) {
+				var id =rows[index];
+				var rowData =$('#dataGrid').dataGrid('getRowData', id);
+
+				if (rowData.filePath=="" || rowData.filePath.length<=0) {
+					continue;
+				} else {
+					pathList.push(rowData.filePath);
+					nameList.push(rowData.fileName);
+				}
+			}
+			if (pathList.length>0){
+				var paths =  encodeURI(encodeURI(pathList));
+				// var names = encodeURI(encodeURI(nameList));
+				var names = nameList;
+				console.log("文件名称："+names);
+				console.log("文件路径："+paths);
+				//将名称传入后台
+				window.location.href = "${ctx}/sys/filemanager/hwFile/download?names="+names+"&paths="+paths;
+			}
+
+		}else {
+			var urls = new Array();
+
+			for (var i = 0; i < rows.length; i++) {
+				var id = rows[i];
+				var rowData = $("#dataGrid").dataGrid("getRowData", id);
+				// alert(rowData)
+
+				// urls[i] = rowData.filePath;
+				var filePath = rowData.filePath;
+				// alert(filePath)
+				var fileName = rowData.fileName;
+				// console.log("单个文件的文件名称："+fileName)
+				download(fileName, filePath);
+			}
+		}
+
+	});
+	function download(fileName,filePath){
+		var a = document.createElement("a"),
+				e = document.createEvent("MouseEvents");
+		e.initEvent("click",false,false);
+		a.href = filePath;
+		a.download=fileName;
+		a.dispatchEvent(e);
+	}
+
 </script>
