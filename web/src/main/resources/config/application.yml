@@ -521,7 +521,8 @@ file:
   enabled: true
 
   # 文件上传根路径，设置路径中不允许包含“userfiles”，在指定目录中系统会自动创建userfiles目录，如果不设置默认为contextPath路径
-  baseDir: D:/jeesite
+  baseDir: /D:/jeesite #生产环境Linux：文件上传路径配置需要根目录/
+  #baseDir: D:/jeesite #测试环境Windows：文件上传路径配置直接是磁盘D,可以不加/
 
   # 上传文件的相对路径（支持：yyyy, MM, dd, HH, mm, ss, E）
   uploadPath: '{yyyy}{MM}/'

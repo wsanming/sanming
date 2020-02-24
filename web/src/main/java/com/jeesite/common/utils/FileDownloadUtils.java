@@ -1,6 +1,7 @@
 package com.jeesite.common.utils;
 
 import com.jeesite.common.config.Global;
+import com.jeesite.common.io.FileUtils;
 import com.jeesite.modules.sys.utils.UserUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -25,7 +26,8 @@ public class FileDownloadUtils {
     public static void downloadFile2Zip(HttpServletRequest request, HttpServletResponse response, String [] names, String [] paths, String[] typeNames) {
         String baseDir = null;
         try {
-            baseDir = Global.getUserfilesBaseDir(URLDecoder.decode(names[0],"utf-8")).substring(0,10);
+            baseDir = FileUtils.path(Global.getUserfilesBaseDir(URLDecoder.decode(names[0],"utf-8")).substring(0,11));
+            System.out.println("baseDir = "+baseDir);
             for(int i = 0; i < names.length; i++){
                 names[i] = URLDecoder.decode(i+"_"+typeNames[i]+"_"+names[i],"utf-8");
                 System.out.println("name= "+names[i]);
