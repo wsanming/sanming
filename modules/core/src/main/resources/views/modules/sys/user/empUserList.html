@@ -114,7 +114,13 @@ $('#dataGrid').dataGrid({
 		{header:'${text("员工姓名")}', name:'refName', index:'a.ref_name', width:200, align:"center"},
 		{header:'${text("入职时间")}', name:'employee.hireDate', index:'e.hire_date', width:200, align:"center"},
 		{header:'${text("转正时间")}', name:'employee.regularDate', index:'e.regular_date', width:200, align:"center"},
-		{header:'${text("是否具有华为认证")}', name:'employee.isHw', index:'e.is_hw', width:200, align:"center"},
+		{header:'${text("是否具有华为认证")}', name:'employee.isHw', index:'e.is_hw', width:200, align:"center",frozen:true, formatter: function(val, obj, row, act){
+				if(val==0){
+					return "否"
+				}else if(val==1){
+					return "是"
+				}
+			}},
 		{header:'${text("归属机构")}', name:'employee.office.officeName', index:'o.office_name', width:200, align:"center"},
 		{header:'${text("归属公司")}', name:'employee.company.companyName', index:'c.company_name', width:200, align:"center"},
 		{header:'${text("电子邮箱")}', name:'email', index:'a.email', width:200, align:"center"},

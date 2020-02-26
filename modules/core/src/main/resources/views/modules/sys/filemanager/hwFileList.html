@@ -161,7 +161,7 @@ $('#dataGrid').dataGrid({
 		var rows = $("#dataGrid").dataGrid("getSelectRows");
 		// alert(rows)
 		if(rows.length<1){
-			alert("请选择要下载的证书")
+			js.showMessage('请选择要下载的文件');
 			return false
 		} else if(rows.length>1){
 

@@ -78,16 +78,18 @@ public class EmpUser extends User {
 	public EmpUser(String id){
 		super(id);
 	}
-	
+
 	@Valid
 	@ExcelFields({
 		@ExcelField(title="归属机构", attrName="employee.office", align=Align.CENTER, sort=10, fieldType=OfficeType.class),
 		@ExcelField(title="归属公司", attrName="employee.company", align = Align.CENTER, sort=20, fieldType=CompanyType.class),
 		@ExcelField(title="登录账号", attrName="loginCode", align=Align.CENTER, sort=30),
 		@ExcelField(title="用户昵称", attrName="userName", align=Align.CENTER, sort=40),
-		@ExcelField(title="入职时间", attrName="employee.hireDate", width=20*256, align=Align.CENTER, sort=900, type=ExcelField.Type.EXPORT, dataFormat="yyyy-MM-dd HH:mm"),
-		@ExcelField(title="转正时间", attrName="employee.regularDate", width=20*256, align=Align.CENTER, sort=900, type=ExcelField.Type.EXPORT, dataFormat="yyyy-MM-dd HH:mm"),
+
+		@ExcelField(title="入职时间", attrName="employee.hireDate", width=20*256, align=Align.CENTER, sort=900, dataFormat="yyyy-MM-dd"),
+		@ExcelField(title="转正时间", attrName="employee.regularDate", width=20*256, align=Align.CENTER, sort=900, dataFormat="yyyy-MM-dd"),
 	    @ExcelField(title="电子邮箱", attrName="email", align=Align.LEFT, sort=50),
+
 		@ExcelField(title="是否具有华为认证", attrName="employee.isHw", align=Align.LEFT, sort=50),
 		@ExcelField(title="手机号码", attrName="mobile", align=Align.CENTER, sort=60),
 		@ExcelField(title="办公电话", attrName="phone", align=Align.CENTER, sort=70),
@@ -105,7 +107,7 @@ public class EmpUser extends User {
 		}
 		return employee;
 	}
-	
+
 	public void setEmployee(Employee employee){
 		super.setRefObj(employee);
 	}

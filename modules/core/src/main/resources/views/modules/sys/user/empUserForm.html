@@ -106,37 +106,6 @@
                         </div>
                     </div>
                 </div>
-                <script src="../../../../static/My97DatePicker"></script>
-                <div class="col-xs-6">
-                    <div class="form-group">
-                        <label class="control-label col-sm-4" title="">
-                            <span class="required">*</span> ${text('入职时间')}：<i
-                                class="fa icon-question hide"></i></label>
-                        <div class="col-sm-8">
-                            <div class="input-group">
-                                <#form:input path="employee.hireDate" id="hireDate" dataFormat="date" maxlength="100"
-                                class="form-control required" onClick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false})"/>
-                                <span class="input-group-addon"><i class="fa fa-fw fa-calendar"></i></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-xs-6">
-                    <div class="form-group">
-                        <label class="control-label col-sm-4" title="">
-                            <span class="required ">*</span> ${text('转正时间')}：<i
-                                class="fa icon-question hide"></i></label>
-                        <div class="col-sm-8">
-                            <div class="input-group">
-                                <#form:input path="employee.regularDate" id="regularDate" dataFormat="date"
-                                maxlength="100" class="form-control required" onClick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false})"/>
-                                <span class="input-group-addon"><i class="fa fa-fw fa-calendar"></i></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
                 <div class="col-xs-6">
                     <div class="form-group">
                         <label class="control-label col-sm-4" title="">
@@ -146,6 +115,38 @@
                         </div>
                     </div>
                 </div>
+            </div>
+            <script src="../../../../static/My97DatePicker"></script>
+            <div class="row">
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label class="control-label col-sm-4" title="">
+                        <span class="required ">*</span> ${text('入职时间')}：<i
+                            class="fa icon-question hide"></i></label>
+                    <div class="col-sm-8">
+                        <div class="input-group">
+                            <#form:input path="employee.hireDate" id="hireDate" dataFormat="date" maxlength="100"
+                            class="form-control required" onClick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false})"/>
+                            <span class="input-group-addon"><i class="fa fa-fw fa-calendar"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                <div class="col-xs-6">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" title="">
+                            <span class="required ">*</span> ${text('转正时间')}：<i
+                                class="fa icon-question hide"></i></label>
+                        <div class="col-sm-8">
+                            <div class="input-group">
+                                <#form:input path="employee.regularDate" id="regularDate" dataFormat="date" maxlength="100"
+                                class="form-control required" onClick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false})"/>
+                                <span class="input-group-addon"><i class="fa fa-fw fa-calendar"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
             <div class="row">
                 <div class="col-xs-6">
@@ -163,11 +164,11 @@
 
 
                 <div class="col-xs-6" id="uploadHw" style="display: none">
-                    <div class="form-group">
-                        <label class="control-label col-sm-4" title="">
-                            <span class="required ">*</span> ${text('相关证书')}：<i
-                                class="fa icon-question hide"></i></label>
-                        <div class="col-xs-6">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4" title="">
+                                    <span class="required ">*</span> ${text('相关证书')}：<i
+                                        class="fa icon-question hide"></i></label>
+                                <div class="col-xs-6">
                             <a href="${ctx}/sys/filemanager/hwFile/form" id="btnUploadFile"
                                class="btn btn-default addTabPage" title="${text('上传证书')}"
                                data-layer="true" data-layer-width="950" data-layer-height="430"><i
@@ -500,7 +501,7 @@ data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-o
         var rows = $("#dataGrid").dataGrid("getSelectRows");
         // alert(rows)
         if(rows.length<1){
-        alert("请选择要下载的证书")
+            js.showMessage('请选择要下载的证书');
             return false
     } else if(rows.length>1){
 
@@ -521,8 +522,8 @@ data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-o
                 var paths =  encodeURI(encodeURI(pathList));
                 // var names = encodeURI(encodeURI(nameList));
                 var names = nameList;
-                console.log("文件名称："+names);
-                console.log("文件路径："+paths);
+                // console.log("文件名称："+names);
+                // console.log("文件路径："+paths);
                 //将名称传入后台
                 window.location.href = "${ctx}/sys/filemanager/hwFile/download?names="+names+"&paths="+paths;
             }
