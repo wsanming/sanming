@@ -157,35 +157,36 @@
 
 	//参数添加进list
 	function addParmas(filePath, fileName, courseName) {
-		filePath = filePath.substring(3);  // 去掉/js
+		filePath = filePath.replace(ctxPath+Global.USERFILES_BASE_URL,""); //去掉 /gok/userfiles/
 		pathList.push(filePath);
 		nameList.push(fileName);
 		courseNameList.push(courseName);
 	}
 
-	// 文件下载
-	function download(name, href) {
-		var a = document.createElement("a"), //创建a标签
-				e = document.createEvent("MouseEvents"); //创建鼠标事件对象
-		e.initEvent("click", false, false); //初始化事件对象
-		a.href = href; //设置下载地址
-		a.download = name; //设置下载文件名
-		a.dispatchEvent(e); //给指定的元素，执行事件click事件
-	}
+	// // 文件下载
+	// function download(name, href) {
+	// 	var a = document.createElement("a"), //创建a标签
+	// 			e = document.createEvent("MouseEvents"); //创建鼠标事件对象
+	// 	e.initEvent("click", false, false); //初始化事件对象
+	// 	var baseUrl ='http://'+window.location.host;
+	// 	a.href = baseUrl+href; //设置下载地址
+	// 	a.download = name; //设置下载文件名
+	// 	a.dispatchEvent(e); //给指定的元素，执行事件click事件
+	// }
 
 	function batchDownload(pathList, nameList, courseNameList) {
-		if (pathList.length == 1){
-			// alert("单个下载："+pathList.length);
-			var filePath ="/js"+pathList[0]; //单个下载，需加上/js
-			download(nameList[0], filePath);
-		} else {
+		// if (pathList.length == 1){
+		// 	// alert("单个下载："+pathList.length);
+		// 	var filePath =ctxPath+pathList[0]; //单个下载，需加上context-path
+		// 	download(nameList[0], filePath);
+		// } else {
 			// alert("批量下载："+pathList.length);
 			var paths =  encodeURI(encodeURI(pathList));
 			var names = encodeURI(encodeURI(nameList));
 			var courseNames = encodeURI(encodeURI(courseNameList));
 			//将名称传入后台
 			window.location.href = "${ctx}/sys/filemanager/courseDate/download?names="+names+"&paths="+paths+"&courseNames="+courseNames;
-		}
+		// }
 	}
 
 </script>

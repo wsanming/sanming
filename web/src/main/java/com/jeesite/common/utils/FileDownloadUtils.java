@@ -2,12 +2,14 @@ package com.jeesite.common.utils;
 
 import com.jeesite.common.config.Global;
 import com.jeesite.common.io.FileUtils;
+import com.jeesite.common.lang.StringUtils;
 import com.jeesite.modules.sys.utils.UserUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.zip.ZipEntry;
@@ -15,8 +17,18 @@ import java.util.zip.ZipOutputStream;
 
 public class FileDownloadUtils {
 
+    private static String baseDir =  FileUtils.path(Global.getUserfilesBaseDir("")); // 获取路径：/D:/jeesite/userfiles/
+
+    public static String getBaseDir() {
+        return baseDir;
+    }
+
+    public static void setBaseDir(String baseDir) {
+        FileDownloadUtils.baseDir = baseDir;
+    }
+
     /**
-     * 课程表资料批量下载
+     * 课程表资料批量下载:压缩文件列表命名方式修改后，如 序号_文件类型_文件名称.xlsx
      * @param request
      * @param response
      * @param names
@@ -24,19 +36,18 @@ public class FileDownloadUtils {
      * @param typeNames 文件类型
      */
     public static void downloadFile2Zip(HttpServletRequest request, HttpServletResponse response, String [] names, String [] paths, String[] typeNames) {
-        String baseDir = null;
         try {
-            baseDir = FileUtils.path(Global.getUserfilesBaseDir(URLDecoder.decode(names[0],"utf-8")).substring(0,11));
+            baseDir = FileDownloadUtils.getBaseDir();
             System.out.println("baseDir = "+baseDir);
             for(int i = 0; i < names.length; i++){
                 names[i] = URLDecoder.decode(i+"_"+typeNames[i]+"_"+names[i],"utf-8");
                 System.out.println("name= "+names[i]);
             }
+            downloadFile2Zip( request,  response, names, paths, baseDir);
 
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        downloadFile2Zip( request,  response, names, paths, baseDir);
     }
 
     public FileDownloadUtils() {
@@ -51,9 +62,11 @@ public class FileDownloadUtils {
          * @param baseDir 服务器上传文件跟路径
          */
     public static void downloadFile2Zip(HttpServletRequest request, HttpServletResponse response, String [] names, String [] paths, String baseDir) {
-
         //存放在服务器上zip文件的目录
-        String directory = baseDir+"\\zipDir";
+        if (StringUtils.isEmpty(baseDir)) {
+            baseDir= FileDownloadUtils.getBaseDir();
+        }
+        String directory = FileUtils.path(baseDir.substring(0,11)+"\\zipDir");
         File directoryFile=new File(directory);
         if(!directoryFile.isDirectory() && !directoryFile.exists()){ //判断是否存在目录
             directoryFile.mkdirs();
@@ -61,7 +74,7 @@ public class FileDownloadUtils {
         //设置最终输出zip文件的目录+文件名
         SimpleDateFormat formatter  = new SimpleDateFormat("yyMMddHHmmss");
         String zipFileName = formatter.format(new Date())+"_"+UserUtils.getUser()+".zip";
-        String strZipPath = directory+"\\"+zipFileName;
+        String strZipPath = FileUtils.path(directory+"\\"+zipFileName);
 
         ZipOutputStream zipStream = null;
         FileInputStream zipSource = null;
@@ -118,7 +131,11 @@ public class FileDownloadUtils {
         }
         //判断系统压缩包是否存：true则把压缩包输出到客户端并删除压缩文件，false则不操作
         if (zipFile.exists()){
-            downloadFile(response,zipFileName,strZipPath);
+            try {
+                downloadFile(request, response,zipFileName,strZipPath);
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
             zipFile.delete();
         }
     }
@@ -129,7 +146,15 @@ public class FileDownloadUtils {
      * @param filename
      * @param path
      */
-    public static void downloadFile(HttpServletResponse response, String filename, String path) {
+    public static void downloadFile(HttpServletRequest request, HttpServletResponse response, String filename, String path) throws UnsupportedEncodingException {
+        String userAgent = request.getHeader("user-agent").toLowerCase();
+        if (userAgent.contains("msie")) {
+            // win10 ie
+            filename = URLEncoder.encode(filename, "UTF-8");
+        } else {
+            // edge 谷歌、火狐浏览器
+            filename = new String(filename.getBytes("UTF-8"), "iso-8859-1");
+        }
         if (filename != null) {
             FileInputStream is = null;
             BufferedInputStream bs = null;
@@ -137,11 +162,11 @@ public class FileDownloadUtils {
             try {
                 File file = new File(path);
                 if (file.exists()) {
+                    response.setCharacterEncoding("utf-8");
                     //设置Headers
                     response.setHeader("Content-Type", "application/octet-stream");
                     //设置下载的文件名称，并用于解决中文乱码问题
-                    response.setHeader("Content-Disposition", "attachment;filename="
-                            + new String(filename.getBytes("UTF-8"), "ISO8859-1"));
+                    response.setHeader("Content-Disposition", "attachment;filename=" + filename);
                     is = new FileInputStream(file);
                     bs = new BufferedInputStream(is);
                     os = response.getOutputStream();

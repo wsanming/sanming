@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 /**
@@ -96,7 +97,17 @@ public class CourseDateService extends CrudService<CourseDateDao, CourseDate> {
 	 */
 	@Transactional(readOnly=false)
 	public void download(HttpServletRequest request, HttpServletResponse response, String [] names, String [] paths, String[] courseNames) {
-		FileDownloadUtils.downloadFile2Zip( request,  response, names, paths, courseNames);
+
+		if (names.length==1) {
+			String rerealFilePath =FileDownloadUtils.getBaseDir()+paths[0];
+			try {
+				FileDownloadUtils.downloadFile(request, response, names[0], rerealFilePath);
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
+		} else {
+			FileDownloadUtils.downloadFile2Zip( request,  response, names, paths, courseNames);
+		}
 	}
 
 }
