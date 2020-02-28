@@ -138,7 +138,7 @@ $('#dataGrid').dataGrid({
 		{header:'${text("操作")}', name:'actions', width:120, sortable:false, title:false, formatter: function(val, obj, row, act){
 			var actions = [];
 			<% if(hasPermi('sys:filemanager:hwFile:edit')){ %>
-				actions.push('<a href="${ctx}/sys/filemanager/hwFile/form?certificateId='+row.certificateId+'&loginCode='+'" class="btnList" title="${text("编辑华为证书")}"><i class="fa fa-pencil"></i></a>&nbsp;');
+				actions.push('<a href="${ctx}/sys/filemanager/hwFile/form?certificateId='+row.certificateId+'&loginCode=+'+'" class="btnList" title="${text("编辑华为证书")}"><i class="fa fa-pencil"></i></a>&nbsp;');
 				if (row.status == Global.STATUS_NORMAL){
 					actions.push('<a href="${ctx}/sys/filemanager/hwFile/disable?certificateId='+row.certificateId+'" class="btnList" title="${text("停用华为证书")}" data-confirm="${text("确认要停用该华为证书吗？")}"><i class="glyphicon glyphicon-ban-circle"></i></a>&nbsp;');
 				}

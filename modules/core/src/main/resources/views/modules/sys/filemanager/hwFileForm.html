@@ -66,8 +66,8 @@
                             <label class="control-label col-sm-4" title="">
                                 <span class="required ">*</span> ${text('证书持有者')}：<i class="fa icon-question hide"></i></label>
                             <div class="col-sm-8">
-                                <#form:input id="certificateHolder" name="certificateHolder" maxlength="10" class="form-control required"
-                                placeholder="${text('务必填写持有者的登录账号。')}" value="${loginCode}"/>
+                                <#form:input path="certificateHolder" maxlength="10" class="form-control required"
+                                placeholder="${text('务必填写持有者的登录账号。')}"/>
                             </div>
                         </div>
                     </div>
