@@ -191,6 +191,7 @@ public class Employee extends DataEntity<Employee> {
 	public void setIsHw(String isHw){
 		this.isHw = isHw;
 	}
+
 	public List<EmployeeOffice> getEmployeeOfficeList() {
 		return employeeOfficeList;
 	}

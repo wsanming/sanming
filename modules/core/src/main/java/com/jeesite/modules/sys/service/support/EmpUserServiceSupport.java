@@ -10,7 +10,9 @@ import javax.validation.ConstraintViolationException;
 
 import org.beetl.ext.fn.Print;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.jeesite.common.config.Global;
@@ -38,9 +40,9 @@ import com.jeesite.modules.sys.utils.UserUtils;
  * @author ThinkGem
  * @version 2017-03-25
  */
+@Service
 @Transactional(readOnly=true)
-public class EmpUserServiceSupport extends CrudService<EmpUserDao, EmpUser>
-		implements EmpUserService{
+public class EmpUserServiceSupport extends CrudService<EmpUserDao, EmpUser> implements EmpUserService{
 
 	@Autowired
 	private UserService userService;
@@ -48,6 +50,8 @@ public class EmpUserServiceSupport extends CrudService<EmpUserDao, EmpUser>
 	private EmployeeService employeeService;
 	@Autowired
 	private EmployeeOfficeDao employeeOfficeDao;
+	@Autowired
+	private EmpUserService empUserService;
 	
 	/**
 	 * 获取单条数据
@@ -231,5 +235,19 @@ public class EmpUserServiceSupport extends CrudService<EmpUserDao, EmpUser>
 		userService.delete(empUser);
 		employeeService.delete(empUser.getEmployee());
 	}
+
+	/**
+	 * 查找用户
+	 * @param loginCode
+	 * @return
+	 */
+	@Override
+	@Transactional(readOnly = true)
+	public List<EmpUser> selectByLoginCode(@RequestParam String certificateHolder){
+		System.out.println(certificateHolder);
+		List<EmpUser> list = dao.selectByLoginCode(certificateHolder);
+		return list;
+	}
+
 	
 }

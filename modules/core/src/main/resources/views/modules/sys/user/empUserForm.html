@@ -183,11 +183,13 @@
                     <div class="form-group">
                         <label class="control-label col-sm-2" title="">
                             <span class="required hide">*</span> ${text('已有证书')}：<i
-                                class="fa icon-question hide"></i></label>
-<!--                        <button id="btnDownload" class="btn btn-info btn-xs blue" title="支持批量下载" ><i class=" fa fa-download"></i>下载</button>-->
-<!--                        <input type="button" id="btnDownload" class="fa fa-download" title="支持批量下载" value="下载"><i class=" fa fa-download"></i>下载</input>-->
-                        <a  id="btnDownload" class="btnList" title="${text('支持批量下载')}"><i class="fa fa-download"></i>下载</a>
+                                class="fa icon-question hide"></i>
 
+                                <a  id="btnDownload" class="btn btn-default " title="${text('支持批量下载')}"><i class="fa fa-download"></i>下载</a>
+
+                        </label>
+<!--                        <a  id="btnDownload" class="btn " title="${text('支持批量下载')}"><i class="fa fa-download"></i>下载</a>-->
+<!--                        <a  id="btnDownload" class="btn btn-default " title="${text('支持批量下载')}"><i class="fa fa-download"></i>下载</a>-->
                         <div class="col-sm-10" id="hw">
                             <table id="dataGrid"> </table>
                             <div id="dataGridPage"></div>
@@ -463,7 +465,7 @@ data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-o
                 formatter: function (val, obj, row, act) {
                     var actions = [];
                 <% if(hasPermi('sys:filemanager:hwFile:edit')){ %>
-                        actions.push('<a href="${ctx}/sys/filemanager/hwFile/form?certificateId='+row.certificateId+'" class="btnList" title="${text("编辑华为证书")}"><i class="fa fa-pencil"></i></a>&nbsp;');
+                        actions.push('<a href="${ctx}/sys/filemanager/hwFile/form?certificateId='+row.certificateId+'&loginCode=+'+'" class="btnList" title="${text("编辑华为证书")}"><i class="fa fa-pencil"></i></a>&nbsp;');
                         if (row.status == Global.STATUS_NORMAL){
                             actions.push('<a href="${ctx}/sys/filemanager/hwFile/disable?certificateId='+row.certificateId+'" class="btnList" title="${text("停用华为证书")}" data-confirm="${text("确认要停用该华为证书吗？")}"><i class="glyphicon glyphicon-ban-circle"></i></a>&nbsp;');
                         }
@@ -487,14 +489,6 @@ data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-o
     });
 </script>
 
-
-<!--<script src="http://webapp.didistatic.com/static/webapp/shield/z/vue/vue/1.0.24/vue.min.js"></script>-->
-<!--<script src="http://stuk.github.io/jszip/dist/jszip.js"></script>-->
-
-<!--<script type="text/javascript" src="http://stuk.github.io/jszip-utils/dist/jszip-utils.js"></script>-->
-<!--<script type="text/javascript" src="http://stuk.github.io/jszip-utils/dist/jszip-utils-ie.js"></script>-->
-<!--<script src="https://unpkg.com/axios/dist/axios.min.js"></script>-->
-<!--<script src="http://stuk.github.io/jszip/vendor/FileSaver.js"></script>-->
 <script>
 
     $("#btnDownload").click(function(){
@@ -503,7 +497,7 @@ data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-o
         if(rows.length<1){
             js.showMessage('请选择要下载的证书');
             return false
-    } else if(rows.length>1){
+    } else{
 
             var nameList = [];
             var pathList = [];
@@ -514,7 +508,7 @@ data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-o
                 if (rowData.filePath=="" || rowData.filePath.length<=0) {
                     continue;
                 } else {
-                    pathList.push(rowData.filePath);
+                    pathList.push(rowData.filePath.replace(ctxPath+Global.USERFILES_BASE_URL,""));
                     nameList.push(rowData.fileName);
                 }
             }
@@ -528,57 +522,7 @@ data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-o
                 window.location.href = "${ctx}/sys/filemanager/hwFile/download?names="+names+"&paths="+paths;
             }
 
-    }else {
-            var urls = new Array();
-
-            for (var i = 0; i < rows.length; i++) {
-                var id = rows[i];
-                var rowData = $("#dataGrid").dataGrid("getRowData", id);
-                // alert(rowData)
-
-                // urls[i] = rowData.filePath;
-                var filePath = rowData.filePath;
-                // alert(filePath)
-                var fileName = rowData.fileName;
-                // console.log("单个文件的文件名称："+fileName)
-                download(fileName, filePath);
-            }
-
-        //     var zip  = new JSZip();
-        //     var file_name = "华为证书.zip";
-        //     let urls = new Array();
-        //     for(let i=0;i<rows.length;i++){
-        //
-        //       let id = rows[i];
-        //       urls[i]=$("#dataGrid").dataGrid("getRowData", id).filePath;
-        //
-        // }
-        //     console.log(urls)
-        //     var len=function(arr){
-        //         var l = 0;
-        //         for(var key in arr){
-        //             l++;
-        //         }
-        //         return l;
-        //     }
-        //     for(let i=0;i<urls.length;i++){
-        //     //对每一个图片连接获取base64的数据，并使用回调函数处理
-        //         getBase64Image(urls[i],function (dataURL) {
-        //
-        //         //对获取的图片base64数据进行处理
-        //             var url = dataURL.split(",");
-        //             zip.file(i.toString()+'.jpg',url[1],{base64: true});//根据base64数据在压缩包中生成jpg数据
-        //             var ziplength = len(zip.files);
-        //             if(ziplength==urls.length){//当所有图片都已经生成打包并保存zip
-        //                 zip.generateAsync({type:"blob"})
-        //                     .then(function(content) {
-        //                         //console.log(content);
-        //                         saveAs(content, file_name);
-        //                     });
-        //             }
-        //         })
-        // }
-        }
+    }
 
     });
     function download(fileName,filePath){
@@ -589,20 +533,19 @@ data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-o
         a.download=fileName;
         a.dispatchEvent(e);
     }
-    //****传入图片链接，返回base64数据
-    // function getBase64Image(images,callback) {
-    //     var img = new Image();
-    //     var canvas = document.createElement("canvas");
-    //     img.onload = function(){
-    //         canvas.getContext("2d").drawImage(img,0,0);
-    //         var dataURL=canvas.toDataURL();//使用canvas获取图片的base64数据
-    //
-    //         callback?callback(dataURL):null; //调用回调函数
-    //
-    //     }
-    //     img.src = images;
-    // }
+</script>
 
+
+<script>
+    $("#loginCode").blur(function(){
+        var loginCode = $("#loginCode").val()
+        // alert(loginCode)
+        var href =  $("#btnUploadFile").attr("href")
+        // alert(href)
+        href = href+"?loginCode="+loginCode
+        // alert(href)
+        $("#btnUploadFile").attr("href",href)
+    })
 </script>
 
 

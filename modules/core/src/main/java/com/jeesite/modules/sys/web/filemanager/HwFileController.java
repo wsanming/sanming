@@ -20,10 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import com.jeesite.common.config.Global;
 import com.jeesite.common.entity.Page;
@@ -89,8 +86,10 @@ public class HwFileController extends BaseController {
      */
     @RequiresPermissions("sys:filemanager:hwFile:view")
     @RequestMapping(value = "form")
-    public String form(HwFile hwFile, Model model) {
+    public String form(HwFile hwFile, @RequestParam("loginCode") String loginCode, Model model) {
         model.addAttribute("hwFile", hwFile);
+        model.addAttribute("loginCode",loginCode);
+        System.out.println("证书持有者："+loginCode);
         return "modules/sys/filemanager/hwFileForm";
     }
 
@@ -169,135 +168,12 @@ public class HwFileController extends BaseController {
      * @param names
      * @param paths
      */
-
     @RequestMapping(value = "download")
-    public void download(HttpServletRequest request, HttpServletResponse response, String [] names, String [] paths) {
-        String scheme = request.getScheme();//http
-        String serverName = request.getServerName();//localhost
-        int port = request.getServerPort();//8080
-        String servePath = scheme+"://"+serverName+":"+port;  // http://localhost:8980/js/
-        //存放--服务器上zip文件的目录
-        String directory = "D:\\repository\\zipDir";
-        File directoryFile=new File(directory);
-        if(!directoryFile.isDirectory() && !directoryFile.exists()){ //判断是否存在目录
-            directoryFile.mkdirs();
-        }
-        //设置最终输出zip文件的目录+文件名
-        SimpleDateFormat formatter  = new SimpleDateFormat("yyyy年MM月dd日HH时mm分ss秒");
-        String zipFileName = formatter.format(new Date())+".zip";
-        String strZipPath = directory+"\\"+zipFileName;
-
-        ZipOutputStream zipStream = null;
-        FileInputStream zipSource = null;
-        BufferedInputStream bufferStream = null;
-        File zipFile = new File(strZipPath);
-        //构造最终压缩包的输出流
-        try {
-            zipStream = new ZipOutputStream(new FileOutputStream(zipFile));
-
-            for(int i = 0; i < paths.length; i++){
-                System.out.println("文件名称："+names[i]);
-                //解码获取真实路径+真实文件名
-                String realFileName = URLDecoder.decode(names[i],"utf-8");
-//                System.out.println("磁盘："+Global.getUserfilesBaseDir(""));
-
-//                System.out.println("文件路径："+URLDecoder.decode(Global.getUserfilesBaseDir("")+paths[i].substring(13),"utf-8"));
-
-//                String realFilePath ="D:\\jeesite\\userfiles\\fileupload\\202001\\1215928295040294913.pdf";// servePath+URLDecoder.decode(paths[i],"utf-8");   //  /js/userfiles/fileupload/202001/1217655236346392578.txt
-                String realFilePath =Global.getUserfilesBaseDir("")+paths[i].substring(13);
-
-                File file = new File(realFilePath);
-                if (file.exists()) {
-                    //将需要压缩的文件格式化为输入流
-                    zipSource = new FileInputStream(file);
-					/*
-					压缩条目不是具体独立的文件，而是压缩包文件列表的条目，这里的name为文件名，
-					当文件名name和之前的重复就会导致文件被覆盖
-					 */
-                    ZipEntry zipEntry = new ZipEntry(realFileName); //压缩条目中的文件名
-                    zipStream.putNextEntry(zipEntry); //定位该压缩条目位置，开始将文件写日到压缩包中
-                    bufferStream = new BufferedInputStream(zipSource, 1024*10);
-                    int read = 0;
-                    byte[] buf = new byte[1024 * 10];
-                    while ((read = bufferStream.read(buf, 0, 1024*10)) != -1) {
-                        zipStream.write(buf, 0, read);
-                    }
-                } else {
-                    System.out.println("========================下载文件未找到："+realFilePath );
-//					String error = "下载的文件资源不存在";
-//					response.getWriter().write(new JSONObject().put("error", error).toString());
-
-                }
-            }
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (bufferStream != bufferStream)
-                    bufferStream.close();
-                if (zipStream != null) {
-                    zipStream.flush();
-                    zipStream.close();
-                }
-                if (zipSource != null)
-                    zipSource.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        //判断系统压缩包是否存在：true则把压缩包输出到客户端并删除压缩文件，false则不操作
-        if (zipFile.exists()){
-            downFile(response,zipFileName,strZipPath);
-            zipFile.delete();
-        }
-    }
-
-    private void downFile(HttpServletResponse response,String filename,String path) {
-        if (filename != null) {
-            FileInputStream is = null;
-            BufferedInputStream bs = null;
-            OutputStream os = null;
-            try {
-                File file = new File(path);
-                if (file.exists()) {
-                    //设置Headers
-                    response.setHeader("Content-Type", "application/octet-stream");
-                    //设置下载的文件名称，并用于解决中文乱码问题
-                    response.setHeader("Content-Disposition", "attachment;filename="
-                            + new String(filename.getBytes("UTF-8"), "ISO8859-1"));
-                    is = new FileInputStream(file);
-                    bs = new BufferedInputStream(is);
-                    os = response.getOutputStream();
-
-                    byte[] buffer = new byte[1024];
-                    int len = 0;
-                    while ((len = bs.read(buffer)) !=-1) {
-                        os.write(buffer, 0, len);
-                    }
-                } else {
-                    System.out.println("============下载的文件资源不存在============");
-                }
-            } catch(IOException ex) {
-                ex.printStackTrace();
-            } finally {
-                try {
-                    if (is != null)
-                        is.close();
-                    if (bs != null)
-                        bs.close();
-                    if (os != null) {
-                        os.flush();
-                        os.close();
-                    }
-                } catch (IOException  e) {
-                    e.printStackTrace();
-                }
-            }
+    public void download(HttpServletRequest request, HttpServletResponse response, String [] names, String [] paths) throws UnsupportedEncodingException {
+        if (paths.length==1) {
+            hwFileService.downloadOne(response,names,paths);
+        }else{
+            hwFileService.downloadMore(request, response, names, paths);
         }
     }
 }

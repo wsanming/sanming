@@ -5,6 +5,8 @@ package com.jeesite.modules.sys.service;
 
 import java.util.List;
 
+import com.jeesite.modules.sys.entity.User;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.jeesite.common.entity.Page;
@@ -82,5 +84,9 @@ public interface EmpUserService extends CrudServiceApi<EmpUser> {
 	 */
 	@Override
 	public void delete(EmpUser empUser);
-	
+
+	/**
+	 * 根据登录账号查询用户，返回数值，判断时候存在
+	 */
+	public List<EmpUser> selectByLoginCode(@RequestParam String certificateHolder);
 }

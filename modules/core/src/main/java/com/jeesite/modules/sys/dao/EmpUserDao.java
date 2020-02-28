@@ -8,6 +8,7 @@ import java.util.List;
 import com.jeesite.common.dao.CrudDao;
 import com.jeesite.common.mybatis.annotation.MyBatisDao;
 import com.jeesite.modules.sys.entity.EmpUser;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * 员工管理DAO接口
@@ -36,5 +37,7 @@ public interface EmpUserDao extends CrudDao<EmpUser> {
 	 * 根据岗位编码查询用户，仅返回基本信息
 	 */
 	public List<EmpUser> findUserListByPostCodes(EmpUser empUser);
+
+	public List<EmpUser> selectByLoginCode(@RequestParam String certificateHolder);
 	
 }

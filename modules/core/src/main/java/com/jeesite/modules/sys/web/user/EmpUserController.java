@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.jeesite.modules.sys.service.filemanager.HwFileService;
+import com.jeesite.modules.sys.service.support.EmpUserServiceSupport;
 import org.apache.poi.hwpf.model.io.HWPFFileSystem;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -72,6 +73,8 @@ public class EmpUserController extends BaseController {
 	private RoleService roleService;
 	@Autowired
 	private HwFileService hwFileService;
+	@Autowired
+	private EmpUserServiceSupport empUserServiceSupport;
 
 	@ModelAttribute
 	public EmpUser get(String userCode, boolean isNewRecord) {
@@ -157,25 +160,23 @@ public class EmpUserController extends BaseController {
 	public Page<HwFile> hwListData(HwFile hwFile,@RequestParam("loginCode") String loginCode, HttpServletRequest request, HttpServletResponse response) {
 		Page<HwFile> page = new Page<HwFile>();//loginCode
 		hwFile.setPage(new Page<>(request, response));
-
-		System.out.println("@#-----------------------:"+loginCode);
 		//获取当前用户的华为证书
 
 //		HwFile hwFile = new HwFile();
 		hwFile.setCertificateHolder(loginCode);
-		System.out.println("查询证书获取到登录账号：" + hwFile.getCertificateHolder());
+//		System.out.println("查询证书获取到登录账号：" + hwFile.getCertificateHolder());
 		List<HwFile> hwFileList = hwFileService.findHwFileByLoginCode(hwFile.getCertificateHolder());
 
 		page.setList(hwFileList);
-		System.out.println("----------page.getList()=:"+page.getList());    // 获取当前页数据
+//		System.out.println("----------page.getList()=:"+page.getList());    // 获取当前页数据
 //		model.addAttribute("hwFileList", hwFileService.findHwFileByLoginCode(hwFile.getFileHolder());
 
-		for (HwFile hw : hwFileList) {
-			System.out.println("证书持有者：" + hw.getCertificateHolder());
-			System.out.println("证书方向：" + hw.getCertificateDirection());
-			System.out.println("证书名称：" + hw.getFileName());
-
-		}
+//		for (HwFile hw : hwFileList) {
+//			System.out.println("证书持有者：" + hw.getCertificateHolder());
+//			System.out.println("证书方向：" + hw.getCertificateDirection());
+//			System.out.println("证书名称：" + hw.getFileName());
+//
+//		}
 		return page;
 	}
 
@@ -433,5 +434,15 @@ public class EmpUserController extends BaseController {
 		model.addAttribute("empUser", empUser);
 		return "modules/sys/user/empUserSelect";
 	}
+
+//	@RequiresPermissions("sys:empUser:view")
+//	@RequestMapping(value = "findUser")
+//	@ResponseBody
+//	public String selectByLoginCode(@RequestParam("certificateHolder") String certificateHolder,Model model){
+//		List<EmpUser> list = empUserServiceSupport.selectByLoginCode(certificateHolder);
+//		System.out.println("查询结果"+list);
+//		model.addAttribute("userList",list);
+//		return "modules/sys/filemanager/hwFileForm";
+//	}
 	
 }

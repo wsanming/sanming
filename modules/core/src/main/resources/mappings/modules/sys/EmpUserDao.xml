@@ -100,5 +100,12 @@
 				#{code}
 			</foreach>
 	</select>
-	
+
+<!--	根据登录账号查找用户-->
+	<select id="selectByLoginCode" resultType="EmpUser">
+		select *
+		from ${_prefix}sys_user f
+		where
+			f.login_code = #{loginCode}
+	</select>
 </mapper>

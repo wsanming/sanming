@@ -15,7 +15,7 @@
         <div class="box-body">
             <div class="form-unit">${text('基本信息')}</div>
             <#form:hidden path="certificateId"/>
-            <div class="row">
+                    <div class="row">
                 <div class="row">
                     <div class="col-xs-12">
                         <div class="form-group">
@@ -66,8 +66,8 @@
                             <label class="control-label col-sm-4" title="">
                                 <span class="required ">*</span> ${text('证书持有者')}：<i class="fa icon-question hide"></i></label>
                             <div class="col-sm-8">
-                                <#form:input path="certificateHolder" maxlength="10" class="form-control required"
-                                placeholder="${text('必须填写登录账号。')}"/>
+                                <#form:input id="certificateHolder" name="certificateHolder" maxlength="10" class="form-control required"
+                                placeholder="${text('务必填写持有者的登录账号。')}" value="${loginCode}"/>
                             </div>
                         </div>
                     </div>
@@ -79,7 +79,7 @@
                                 <span class="required ">*</span> ${text('证书到期时间')}：<i class="fa icon-question hide"></i></label>
                             <div class="col-sm-8">
                                 <#form:input path="certificateDate" readonly="true" maxlength="20"
-                                class="form-control Wdate required" dataFormat="datetime" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
+                                class="form-control Wdate required" dataFormat="date" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
                             </div>
                         </div>
                     </div>
@@ -103,7 +103,7 @@
                     <!--							</div>-->
                     <!--						</div>-->
                     <!--					</div>-->
-                    <div class="col-xs-6">
+                    <div class="col-xs-6" style="display: none">
                         <div class="form-group">
                             <label class="control-label col-sm-4" title="">
                                 <span class="required ">*</span> ${text('文件路径')}：<i
@@ -188,7 +188,7 @@
 </div>
 <% } %>
 <script>
-    $("#inputForm").validate({
+        $("#inputForm").validate({
         submitHandler: function (form) {
             js.ajaxSubmitForm($(form), function (data) {
                 js.showMessage(data.message);
@@ -201,3 +201,18 @@
         }
     });
 </script>
+
+<!--<script>-->
+
+<!--   $("#certificateHolder").blur(function(){-->
+<!--       var certificateHolder = $("#certificateHolder").val()-->
+<!--       alert(certificateHolder)-->
+<!--       window.location.href = "${ctx}/sys/empUser/findUser?certificateHolder="+certificateHolder;-->
+<!--        var userList = $("userList")-->
+<!--       if (userList.empty()){-->
+<!--           alert("该用户不存在")-->
+<!--           window.location.reload()-->
+<!--       }-->
+<!--   })-->
+
+<!--</script>-->

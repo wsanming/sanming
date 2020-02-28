@@ -7,13 +7,13 @@
 			</div>
 			<div class="box-tools pull-right">
 				<a href="#" class="btn btn-default" id="btnSearch" title="${text('查询')}"><i class="fa fa-filter"></i> ${text('查询')}</a>
-				<% if(hasPermi('sys:filemanager:hwFile:edit')){ %>
-					<a href="${ctx}/sys/filemanager/hwFile/form" class="btn btn-default btnTool" title="${text('新增华为证书')}"><i class="fa fa-plus"></i> ${text('新增')}</a>
-				<% } %>
+<!--				<% if(hasPermi('sys:filemanager:hwFile:edit')){ %>-->
+<!--					<a href="${ctx}/sys/filemanager/hwFile/form?loginCode=" class="btn btn-default btnTool" title="${text('新增华为证书')}"><i class="fa fa-plus"></i> ${text('新增')}</a>-->
+<!--				<% } %>-->
+				<a  id="btnDownload" class="btn btn-default " title="${text('支持批量下载')}"><i class="fa fa-download"></i>下载</a>
 			</div>
 		</div>
 		<div class="box-body">
-			<a  id="btnDownload" class="btnList" title="${text('支持批量下载')}"><i class="fa fa-download"></i>下载</a>
 			<#form:form id="searchForm" model="${hwFile}" action="${ctx}/sys/filemanager/hwFile/listData" method="post" class="form-inline hide"
 					data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-order-by="${parameter.orderBy}">
 				<div class="form-group">
@@ -113,6 +113,7 @@ $('#dataGrid').dataGrid({
 	//显示复选框
 	showCheckbox:true,
 
+
 	searchForm: $("#searchForm"),
 	columnModel: [
 		{header:'${text("文件名称")}', name:'fileName', index:'a.file_name', width:150, align:"left",
@@ -137,7 +138,7 @@ $('#dataGrid').dataGrid({
 		{header:'${text("操作")}', name:'actions', width:120, sortable:false, title:false, formatter: function(val, obj, row, act){
 			var actions = [];
 			<% if(hasPermi('sys:filemanager:hwFile:edit')){ %>
-				actions.push('<a href="${ctx}/sys/filemanager/hwFile/form?certificateId='+row.certificateId+'" class="btnList" title="${text("编辑华为证书")}"><i class="fa fa-pencil"></i></a>&nbsp;');
+				actions.push('<a href="${ctx}/sys/filemanager/hwFile/form?certificateId='+row.certificateId+'&loginCode='+'" class="btnList" title="${text("编辑华为证书")}"><i class="fa fa-pencil"></i></a>&nbsp;');
 				if (row.status == Global.STATUS_NORMAL){
 					actions.push('<a href="${ctx}/sys/filemanager/hwFile/disable?certificateId='+row.certificateId+'" class="btnList" title="${text("停用华为证书")}" data-confirm="${text("确认要停用该华为证书吗？")}"><i class="glyphicon glyphicon-ban-circle"></i></a>&nbsp;');
 				}
@@ -163,10 +164,11 @@ $('#dataGrid').dataGrid({
 		if(rows.length<1){
 			js.showMessage('请选择要下载的文件');
 			return false
-		} else if(rows.length>1){
+		} else {
 
 			var nameList = [];
 			var pathList = [];
+
 			for (var index = 0; index < rows.length; index++) {
 				var id =rows[index];
 				var rowData =$('#dataGrid').dataGrid('getRowData', id);
@@ -174,35 +176,21 @@ $('#dataGrid').dataGrid({
 				if (rowData.filePath=="" || rowData.filePath.length<=0) {
 					continue;
 				} else {
-					pathList.push(rowData.filePath);
+					pathList.push(rowData.filePath.replace(ctxPath+Global.USERFILES_BASE_URL,""));
 					nameList.push(rowData.fileName);
 				}
 			}
+			console.log("文件路径"+pathList[0])
 			if (pathList.length>0){
 				var paths =  encodeURI(encodeURI(pathList));
 				// var names = encodeURI(encodeURI(nameList));
 				var names = nameList;
-				console.log("文件名称："+names);
-				console.log("文件路径："+paths);
+				// console.log("文件名称："+names);
+				// console.log("文件路径："+paths);
 				//将名称传入后台
 				window.location.href = "${ctx}/sys/filemanager/hwFile/download?names="+names+"&paths="+paths;
 			}
 
-		}else {
-			var urls = new Array();
-
-			for (var i = 0; i < rows.length; i++) {
-				var id = rows[i];
-				var rowData = $("#dataGrid").dataGrid("getRowData", id);
-				// alert(rowData)
-
-				// urls[i] = rowData.filePath;
-				var filePath = rowData.filePath;
-				// alert(filePath)
-				var fileName = rowData.fileName;
-				// console.log("单个文件的文件名称："+fileName)
-				download(fileName, filePath);
-			}
 		}
 
 	});
@@ -216,3 +204,5 @@ $('#dataGrid').dataGrid({
 	}
 
 </script>
+
+

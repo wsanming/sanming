@@ -31,7 +31,7 @@ public class OfficeType {
 			cache.set(cacheList);
 		}
 		for (Office e : cacheList){
-			if (StringUtils.trimToEmpty(val).equals(e.getOfficeName())){
+			if (StringUtils.trimToEmpty(val).equals(e.getOfficeCode())||StringUtils.trimToEmpty(val).equals(e.getOfficeName())){
 				return e;
 			}
 		}
